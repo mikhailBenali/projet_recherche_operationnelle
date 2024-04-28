@@ -24,10 +24,9 @@ def graph_creation():
     # Création des liaisons entre S et C
     for i in range(number_row):
         for j in range(number_column):
+            nom_sommet_s = tab_s[i].nom_sommet
+            nom_sommet_c = tab_c[j].nom_sommet
             if proposition_quantity[i][j] != 0:
-                nom_sommet_s = tab_s[i].nom_sommet
-                nom_sommet_c = tab_c[j].nom_sommet
-
                 # Vérifie si le nom de sommet c n'est pas déjà présent dans la liste link de tab_s[i]
                 if nom_sommet_c not in tab_s[i].link:
                     tab_s[i].link.append(nom_sommet_c)
@@ -36,16 +35,12 @@ def graph_creation():
                 if nom_sommet_s not in tab_c[j].link:
                     tab_c[j].link.append(nom_sommet_s)
 
+    # affichage
+    for p in range(len(tab_s)):
+        print(tab_s[p].nom_sommet)
+        print(tab_s[p].link)
 
-
-
-                # affichage
-                for p in range(len(tab_s)):
-                    print(tab_s[p].nom_sommet)
-                    print(tab_s[p].link)
-
-                for m in range(len(tab_c)):
-                    print(tab_c[m].nom_sommet)
-                    print(tab_c[m].link)
-    print("finito")
+    for m in range(len(tab_c)):
+        print(tab_c[m].nom_sommet)
+        print(tab_c[m].link)
     return
