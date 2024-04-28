@@ -19,10 +19,6 @@ def matrice_couts(matrice):
         m[l] = m[l][:-1] # On prend tout sauf la dernière valeur
     return m
 
-def afficher_matrice(matrice):
-    print("\n")
-    print(pd.DataFrame(matrice).to_string(index=False, header=False))
-
 def balas_hammer(matrice):
     copie_matrice = np.array(matrice)
     
@@ -42,3 +38,28 @@ def balas_hammer(matrice):
     
     print("Pénalités provisions: ", penalites_provisions)
     print("Pénalités commandes: ", penalites_commandes)
+
+def afficher_matrice(matrice):
+    print()
+    # Noms des colonnes
+    noms_colonnes = []
+    for i in range(len(matrice[0])):
+        noms_colonnes.append(f'C{i+1}')
+
+
+    # Noms des lignes
+    noms_lignes = []
+    for j in range(len(matrice)):
+        noms_lignes.append(f'P{j+1}')
+        
+    matrice=pd.DataFrame(matrice, columns=noms_colonnes, index=noms_lignes)
+    provisions = matrice.columns[-1]
+    matrice = matrice.rename(columns={provisions: 'Provisions'})
+    commandes = matrice.index[-1]
+    matrice = matrice.rename(index={commandes: 'Commandes'})
+
+    print(matrice)
+
+def decoration_affichage(message):
+    print("\n" + "#"*50 + "\n")
+    print(message)
