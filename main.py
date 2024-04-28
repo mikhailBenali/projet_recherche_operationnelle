@@ -12,9 +12,11 @@ while True:
         if 1 <= num_proposition <= 12:
             file_name= f'Propositions/proposition {num_proposition}.txt'
             decoration_affichage(f'Problème de transport N°{num_proposition}: \n')
-            proposition_transport=lecture_proposition(file_name)
+            proposition_transport,dimensions=lecture_proposition(file_name)
+            #print(dimensions)
             afficher_proposition_transport(proposition_transport)
-
+            couts_unitaires=matrice_couts(proposition_transport)
+            
             while True:
                 decoration_affichage("Choisissez l'algorithme :")
                 print("1. Nord-Ouest")
@@ -24,6 +26,8 @@ while True:
 
                 if algo_choisi == "1":
                     decoration_affichage("Algorithme Nord-Ouest")
+                    matrice_NO=algo_nord_ouest(proposition_transport,dimensions)
+                    afficher_proposition_transport(matrice_NO)
                 elif algo_choisi == "2":
                     decoration_affichage("Algorithme Balas-Hammer")
                 elif algo_choisi == "3":
@@ -31,7 +35,7 @@ while True:
                     break
                 else:
                     print("Choix invalide. Veuillez entrer 1 ou 2 pour choisir l'algorithme, ou entrer 3 pour revenir au menu principal.")
-                    continue  # Reviens au début de la boucle
+                    continue
         else:
             print("Numéro de proposition de problème de transport invalide. Veuillez entrer un numéro entre 1 et 12.")
     elif choix == "2":

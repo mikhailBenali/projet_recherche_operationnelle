@@ -1,13 +1,27 @@
 import pandas as pd
+import numpy as np
+from colorama import Fore, Style
 
 matrice = []
 def lecture_proposition(fichier):
     m = []
+    dimensions = []
+    num_ligne = 0
     with open(fichier, 'r') as f:
         for line in f:
+            if num_ligne == 0:  # La première ligne contient les dimensions de la matrice
+                dimensions.extend(map(int, line.split()))
             m.append([int(x) for x in line.split()])
+            num_ligne+=1
         m.pop(0) # On retire la ligne des dimensions
         m[-1].append(sum(m[-1])) # Le problème étant équilibré on peut additionner la ligne ou la colonne, cela revient au même
+    return m, dimensions
+
+def matrice_couts(matrice):
+    m = matrice
+    m = m[:-1] # On prend tout sauf la dernière ligne
+    for l in range(np.shape(m)[0]): # On parcours les lignes
+        m[l] = m[l][:-1] # On prend tout sauf la dernière valeur
     return m
 
 def afficher_proposition_transport(matrice):
@@ -28,6 +42,39 @@ def afficher_proposition_transport(matrice):
 
     print(matrice)
 
+def algo_nord_ouest(proposition_transport,dimensions):
+    print("Rq : Les valeurs du tableau correspondent à la répartition des provisions (ce ne sont pas les coûts unitaires) \n")
+    lignes, colonnes = dimensions # Correspond aux dimensions n,m dans la première ligne du fichier de proposition de transport
+    solution = [[0] * (colonnes+1) for _ in range(lignes+1)] # Initialisation Matrice de répartitions des quantités
+    i, j = 0, 0 # Initialisation des indices de ligne et de colonne
+
+    proposition_transport_copie = [ligne[:] for ligne in proposition_transport]
+
+    # Remet les valeurs des provisions et des commandes
+    for i in range(lignes):
+        solution[i][-1] = proposition_transport[i][-1]
+    for j in range(colonnes):
+        solution[-1][j] = proposition_transport[-1][j]
+    # Remet la valeur de la somme totale
+    solution[-1][-1] = proposition_transport[-1][-1]
+
+    i, j = 0, 0  # Réinitialisation des indices de ligne et de colonne
+    while i < lignes and j < colonnes:  # On va remplir le coin en haut à gauche au max à chaque itérations
+        # On assigne la quantité à transporter selon les provisions et les commandes
+        quantite = min(proposition_transport_copie[i][-1], proposition_transport_copie[-1][j])
+        solution[i][j] = quantite
+        # Pour mettre à jour les stocks disponibles
+        proposition_transport_copie[i][-1] -= quantite
+        proposition_transport_copie[-1][j] -= quantite
+        
+        # On passe à la ligne ou la colonne suivante s'il n'y a plus de provisions ou plus de commandes  
+        if proposition_transport_copie[i][-1] == 0:
+            i += 1
+        elif proposition_transport_copie[-1][j] == 0:
+            j += 1
+    
+    return solution
+    
 def decoration_affichage(message):
     print("\n" + "#"*50 + "\n")
     print(message)
