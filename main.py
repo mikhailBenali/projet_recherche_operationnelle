@@ -13,7 +13,6 @@ while True:
             file_name= f'Propositions/proposition {num_proposition}.txt'
             decoration_affichage(f'Problème de transport N°{num_proposition}: \n')
             proposition_transport,dimensions=lecture_proposition(file_name)
-            #print(dimensions)
             afficher_proposition_transport(proposition_transport)
             couts_unitaires=matrice_couts(proposition_transport)
             
