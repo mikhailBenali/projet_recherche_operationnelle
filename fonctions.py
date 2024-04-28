@@ -43,7 +43,7 @@ def balas_hammer(matrice):
     print("Pénalités provisions: ", penalites_provisions)
     print("Pénalités commandes: ", penalites_commandes)
 
-def afficher_matrice(matrice):
+def afficher_proposition_transport(matrice):
     # Noms des colonnes
     noms_colonnes = []
     for i in range(len(matrice[0])):
