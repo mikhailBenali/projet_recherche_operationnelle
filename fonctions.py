@@ -23,7 +23,27 @@ def matrice_couts(matrice):
         m[l] = m[l][:-1] # On prend tout sauf la dernière valeur
     return m
 
-def afficher_proposition_transport(matrice):
+def balas_hammer(matrice):
+    copie_matrice = np.array(matrice)
+    
+    # On calcule les pénalités
+    penalites_provisions = []
+    penalites_commandes = []
+    
+    for ligne in copie_matrice:
+        ligne.sort()
+        penalites_provisions.append(ligne[1] - ligne[0])
+    
+    copie_matrice = np.array(matrice)
+    
+    for colonne in np.transpose(copie_matrice):
+        colonne.sort()
+        penalites_commandes.append(colonne[1] - colonne[0])
+    
+    print("Pénalités provisions: ", penalites_provisions)
+    print("Pénalités commandes: ", penalites_commandes)
+
+def afficher_matrice(matrice):
     # Noms des colonnes
     noms_colonnes = []
     for i in range(len(matrice[0])):
@@ -65,7 +85,7 @@ def algo_nord_ouest(proposition_transport,dimensions):
         # Pour mettre à jour les stocks disponibles
         proposition_transport_copie[i][-1] -= quantite
         proposition_transport_copie[-1][j] -= quantite
-        
+       
         # On passe à la ligne ou la colonne suivante s'il n'y a plus de provisions ou plus de commandes  
         if proposition_transport_copie[i][-1] == 0:
             i += 1
