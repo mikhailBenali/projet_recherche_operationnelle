@@ -1,6 +1,10 @@
 from fonctions import *
+from Methode_marche_pied import *
 
+graph_creation()
+"""
 while True:
+
     decoration_affichage("MENU PRINCIPAL :")
     print("1. Tester une proposition de problème de transport")
     print("2. Quitter")
@@ -21,4 +25,4 @@ while True:
         print("Au revoir !")
         break
     else:
-        print("Choix invalide. Veuillez entrer 1 ou 2.")
+        print("Choix invalide. Veuillez entrer 1 ou 2.")"""
