@@ -12,8 +12,14 @@ while True:
         if 1 <= num_proposition <= 12:
             file_name= f'Propositions/proposition {num_proposition}.txt'
             decoration_affichage(f'Problème de transport N°{num_proposition}: \n')
-            matrice=lecture_proposition(file_name)
-            afficher_matrice(matrice)
+            
+            # Affichage de la matrice
+            proposition=lecture_proposition(file_name)
+            afficher_matrice(proposition)
+            
+            # Application de l'algorithme de Balas-Hammer
+            couts = matrice_couts(proposition)
+            balas_hammer(couts,proposition)
 
         else:
             print("Numéro de proposition de problème de transport invalide. Veuillez entrer un numéro entre 1 et 12.")
