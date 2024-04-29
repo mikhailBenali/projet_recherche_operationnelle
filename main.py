@@ -6,6 +6,15 @@ proposition_quantity = [[10, 20], [10, 40]]
 tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
 degenere = verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id)
 print(degenere)
+graph = {
+    'A': ['B', 'C'],
+    'B': ['C'],
+    'C': ['D'],
+    'D': ['A']
+}
+
+degenere = has_cycle(graph)
+print(degenere)
 
 
 

@@ -143,9 +143,35 @@ def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
                 if (sommet_actuel.link[i] == sommets_supr_nom[j]) & (sommet_actuel.link != sommet_precedent_nom):
                     return True
         nombre_de_sommets_a_parcourir = nombre_de_sommets_a_parcourir - 1
+        #si la liste des destinations n'est pas vide, alors cycle
 
     return False
 
+def has_cycle(graph):
+    visited = set()
+    stack = set()
+
+    def dfs(node):
+        if node in stack:
+            return True
+        if node in visited:
+            return False
+
+        visited.add(node)
+        stack.add(node)
+
+        for neighbor in graph[node]:
+            if dfs(neighbor):
+                return True
+
+        stack.remove(node)
+        return False
+
+    for node in graph:
+        if dfs(node):
+            return True
+
+    return False
 
 
 # supprimer du tableau tous_les_sommets ceux où on est déjà passé
