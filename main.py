@@ -1,7 +1,14 @@
 from fonctions import *
 from Methode_marche_pied import *
 
-graph_creation()
+proposition_quantity = [[10, 20], [0, 40]]
+
+tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
+degenere = verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id)
+print(degenere)
+
+
+
 """
 while True:
 
