@@ -71,9 +71,10 @@ def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
     number_column = len(proposition_quantity[0])
     nombre_sommet = number_row + number_column
 
+
     # Calcul nombre d'arêtes
     nombre_arêtes = 0
-    for i in range(number_row):
+    """for i in range(number_row):
         for j in range(number_column):
             if proposition_quantity[i][j] != 0:
                 nombre_arêtes += 1
@@ -81,13 +82,12 @@ def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
     # Si oui, il est dégénéré
     if nombre_arêtes < nombre_sommet - 1:
         return True
-
+"""
     # Nous vérifions s'il y a un cycle
     # Pour ça on parcourt le graphe en partant de S1
-    nombre_de_sommets_a_parcourir = nombre_sommet
+    nombre_de_sommets_a_parcourir = nombre_sommet - 1
     sommets_parcourus = []
-    sommet_actuel = tab_s[0]
-    tous_les_sommets = tab_s + tab_c
+    sommet_actuel = tab_sommet_id[0]
     sommets_supr_nom = []
     sommet_precedent_nom = None
     trajet_envisageable = []
@@ -95,34 +95,54 @@ def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
     if sommet_actuel.link is None:
         return True
     while nombre_de_sommets_a_parcourir > 0:
+        print(nombre_de_sommets_a_parcourir)
+        # On veut voir où on peut aller
+        for i in range(len(sommet_actuel.link_id)):
+            print("numero du lien", i)
+            # On regarde un sommet dans la liste des sommets
+            # On ne va pas dans le sommet prédécesseur
+
+            # print("sommet act", sommet_actuel)
+
+            if sommet_actuel.link_id[i] != sommet_precedent_nom:
+                # ajout dans trajet envisageable d'un element qui n'est pas le prédécesseur
+
+                # GROS PB CA NE COPIE QUE LE NOM DU SOMMET, PAS LE SOMMET LUI MEME
+                # print("index : ", i)
+                # print(sommet_actuel)
+                # print(len(sommet_actuel.link_id))
+                """for j in range(len(sommet_actuel.link_id)):"""
+                index = sommet_actuel.link_id[i]
+                #print("index : ", index)
+                #print(len(tab_sommet_id))
+                prochain_sommet_nom = tab_sommet_id[index]
+                print("prochain_sommet : ", prochain_sommet_nom.id_sommet)
+                if prochain_sommet_nom not in sommets_supr_nom:
+                    trajet_envisageable.append(prochain_sommet_nom.id_sommet)
+        # On fait effectivement le trajet
+        print("sommet actuel", sommet_actuel.id_sommet)
+        # while trajet_envisageable:
+        # print("sommet act", sommet_actuel)
+        sommets_supr_nom.append(sommet_actuel)
+        # On change le sommet precedent
+        sommet_precedent_nom = sommet_actuel.nom_sommet
+        # On va au premier trajet de la liste
+        # print("len", len(tab_sommet_id))
+        # print("le big tableau",trajet_envisageable)
+        print("id_sommet_envisageable : ", trajet_envisageable)
+        print("nb a parcourir: ", nombre_de_sommets_a_parcourir)
+        sommet_actuel = tab_sommet_id[trajet_envisageable[0]]
+        # On supprime le premier trajet de la liste
+        trajet_envisageable.pop(0)
+
         # Vérifie si un des prochains n'est pas un déjà parcouru, car sinon cycle
         # On parcourt tous les liens du sommet actuel et tous les sommets supr
         for i in range(len(sommet_actuel.link)):
             for j in range(len(sommets_supr_nom)):
                 # Si c'est un truc qu'on a déjà parcouru et que ce n'est pas le prédécesseur
-                if sommet_actuel.link[i] == sommets_supr_nom[j] & sommet_actuel.link != sommet_precedent_nom:
+                if (sommet_actuel.link[i] == sommets_supr_nom[j]) & (sommet_actuel.link != sommet_precedent_nom):
                     return True
-        # On veut voir où on peut aller
-        for i in range(len(sommet_actuel.link)):
-            # On regarde un sommet dans la liste des sommets
-            # On ne va pas dans le sommet prédécesseur
-            if sommet_actuel.link[i] != sommet_precedent_nom:
-                # ajout dans trajet envisageable d'un element qui n'est pas le prédécesseur
-
-                # GROS PB CA NE COPIE QUE LE NOM DU SOMMET, PAS LE SOMMET LUI MEME
-                prochain_sommet_nom = sommet_actuel.link[i]
-                trajet_envisageable.append()
-        # On fait effectivement le trajet
-        while trajet_envisageable is not None:
-            sommets_supr_nom = sommet_actuel.nom_sommet
-            # On change le sommet precedent
-            sommet_precedent_nom = sommet_actuel.nom_sommet
-            # On va au premier trajet de la liste
-            sommet_actuel = trajet_envisageable[0]
-            # On supprime le premier trajet de la liste
-            trajet_envisageable.pop(0)
-
-
+        nombre_de_sommets_a_parcourir = nombre_de_sommets_a_parcourir - 1
 
     return False
 
