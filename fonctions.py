@@ -28,29 +28,44 @@ def balas_hammer(couts, copie_proposition):
     copie_couts = np.array(couts)
     copie_proposition = np.array(copie_proposition)
     
-    copie_proposition[:-1,:-1] = 0
-    afficher_proposition_transport(copie_proposition)
+    copie_proposition[:-1,:-1] = 0 # Initialisation de la matrice de proposition à 0
     
-    # On calcule les pénalités
-    penalites_lignes = []
-    penalites_colonnes = []
+    total = copie_proposition[-1,-1]
     
-    for ligne in copie_couts:
-        ligne.sort()
-        penalites_lignes.append(ligne[1] - ligne[0])
+    provisions = copie_proposition[:,-1]
+    commandes = copie_proposition[-1,:]
     
-    copie_couts = np.array(couts)
-    
-    for colonne in np.transpose(copie_couts):
-        colonne.sort()
-        penalites_colonnes.append(colonne[1] - colonne[0])
-    
-    copie_couts = np.array(couts)
-    
-    penalite_max = -1
-    
-    while any([i == 0 for i in copie_proposition[:-1,:-1].flatten()]):
-    
+    while copie_proposition[:-1,:-1].sum() != total:
+        
+        afficher_proposition_transport(copie_proposition)
+        print(pd.DataFrame(copie_couts))
+        
+        # On calcule les pénalités
+        penalites_lignes = []
+        penalites_colonnes = []
+        
+        for i,ligne in enumerate(copie_couts):
+            if provisions[i] != 0:
+                ligne.sort()
+                print(f"Ligne triée {i} : {ligne}")
+                penalites_lignes.append(ligne[1] - ligne[0])
+            else:
+                penalites_lignes.append(0)
+        
+        copie_couts = np.array(couts)
+        
+        for j,colonne in enumerate(np.transpose(copie_couts)):
+            if commandes[j] != 0:
+                colonne.sort()
+                print(f"Colonne triée {j} : {colonne}")
+                penalites_colonnes.append(colonne[1] - colonne[0])
+            else:
+                penalites_colonnes.append(0)
+        
+        copie_couts = np.array(couts)
+        
+        penalite_max = -1
+        
         # On trouve la plus grande pénalité
         
         penalite_max = max(penalites_lignes + penalites_colonnes)
@@ -59,75 +74,44 @@ def balas_hammer(couts, copie_proposition):
         # On trouve les coordonnées de la pénalité maximale
         
         coord_penalite_max_lignes = [i for i, j in enumerate(penalites_lignes) if j == penalite_max]
-        print("Lignes de pénalité maximale : ", *[i+1 for i in coord_penalite_max_lignes])
+        print("Lignes de pénalité maximale : ", *[i for i in coord_penalite_max_lignes])
         coord_penalite_max_colonnes = [i for i, j in enumerate(penalites_colonnes) if j == penalite_max]
-        print("Colonnes de pénalité maximale : ", *[i+1 for i in coord_penalite_max_colonnes])
+        print("Colonnes de pénalité maximale : ", *[i for i in coord_penalite_max_colonnes])
         
         # Si la pénalité maximale est présente plusieurs fois dans les pénalités des lignes ou colonnes
         #if len(coord_penalite_max_lignes) > 1 or len(coord_penalite_max_colonnes) > 1:
             # On trouve les coordonnées des cases de coût minimal dans ces lignes ou colonnes
         coord_cas_cout_min_ligne = []
         coord_case_cout_min_colonne = []
-        for ligne in coord_penalite_max_lignes:
-            coord_cas_cout_min_ligne  = [(ligne,i) for i, j in enumerate(copie_couts[ligne]) if j == min(copie_couts[ligne])]
-        for colonne in coord_penalite_max_colonnes:
-            coord_case_cout_min_colonne = [(i,colonne) for i, j in enumerate(copie_couts[:,colonne]) if j == min(copie_couts[:,colonne])]
-        # On parcourt les cases de coût minimal
-        capacites_ligne = []
-        capacites_colonne = []
-        # On trouve les capacités des lignes correspondant aux cases de coût minimal
-        for case in coord_cas_cout_min_ligne:
-            # On trouve les provisions et commandes de la case
-            provision = copie_proposition[case[0]][-1]
-            commande = copie_proposition[-1][case[1]]
-            # On calcule le minimum des provisions et des commandes
-            capacites_ligne.append((case[0],case[1],min(provision, commande)))
-        # Idem pour les colonnes
-        for case in coord_case_cout_min_colonne:
-            # On trouve les provisions et commandes de la case
-            provision = copie_proposition[case[0]][-1]
-            commande = copie_proposition[-1][case[1]]
-            # On calcule le minimum des provisions et des commandes
-            capacites_colonne.append((case[0],case[1],min(provision, commande)))
-        # On choisit le maximum de toutes ces provisions et commandes (ainsi que les coordonnées de la case correspondante)
-        capacite_max_lignes = []
-        capacite_max_colonnes = []
         
-        if capacites_ligne != []:
-            capacite_max_lignes = max(capacites_ligne, key=lambda x:x[2]) # On prend le maximum des capacités
-        if capacites_colonne != []:
-            capacite_max_colonnes = max(capacites_colonne, key=lambda x:x[2]) # On prend le maximum des capacités
+        for ligne in range(len(coord_penalite_max_lignes)):
+            l = copie_couts[ligne].copy()
+            l = [(ligne,colonne, l[colonne], min(provisions[ligne],commandes[colonne])) for colonne in range(len(l))]
+            l_filtre = []
+            for t in l:
+                if not(t[2] != min(*[t[2] for t in l]) or copie_proposition[t[0],t[1]] != 0 or t[3] == 0): # Si le coût n'est pas minimal ou si la case est déjà remplie ou si la capacité est nulle
+                    l_filtre.append(t)
+            print(f"Ligne après filtrage : {l}")
+            coord_cas_cout_min_ligne.extend(l)
+            
+        for colonne in range(len(coord_penalite_max_colonnes)):
+            c= np.transpose(copie_couts)[colonne].copy()
+            c = [(ligne,colonne,c[ligne],min(provisions[ligne],commandes[colonne])) for ligne in range(len(c))]
+            c_filtre = []
+            for t in c:
+                if not (t[2] != min(*[t[2] for t in c]) or copie_proposition[t[0],t[1]] != 0 or t[3] == 0):
+                    c_filtre.append(t)
+            print(f"Colonne après filtrage : {c}")
+            coord_case_cout_min_colonne.extend(c)
         
-        print("Capacité maximale des lignes : ", capacite_max_lignes)
-        print("Capacité maximale des colonnes : ", capacite_max_colonnes)
+        case_capacite_max = max(coord_cas_cout_min_ligne + coord_case_cout_min_colonne, key=lambda x:x[3])
+        print("Case de capacité maximale : ", case_capacite_max)
+        input()
         
-        # On remplit la case de coût minimal avec ce maximum
-        if capacite_max_lignes != [] and capacite_max_colonnes != []:
-            print("Les deux capacités maximales sont présentes")
-            if capacite_max_lignes[2] > capacite_max_colonnes[2]: # Si la capacité maximale est dans les lignes
-                copie_proposition[capacite_max_lignes[0]][capacite_max_lignes[1]] = capacite_max_lignes[2] # On remplit la case
-                # On mets des 0 dans le reste de la ligne
-                print(copie_proposition[capacite_max_lignes[0],:-1])
-                copie_proposition[capacite_max_lignes[0],:-1] = 0
-            elif capacite_max_colonnes[2] > capacite_max_lignes[2] :
-                copie_proposition[capacite_max_colonnes[0]][capacite_max_colonnes[1]] = capacite_max_colonnes[2]
-                # On mets des 0 dans le reste de la colonne
-                print(copie_proposition[:-1,capacite_max_colonnes[1]])
-                copie_proposition[:-1,capacite_max_colonnes[1]] = 0
-        elif capacite_max_lignes != []:
-            print("La capacité maximale des lignes est présente")
-            copie_proposition[capacite_max_lignes[0]][capacite_max_lignes[1]] = capacite_max_lignes[2] # On remplit la case
-            # On mets des 0 dans le reste de la ligne
-            print(copie_proposition[capacite_max_lignes[0],:-1])
-            copie_proposition[capacite_max_lignes[0],:-1] = 0
-        elif capacite_max_colonnes != []:
-            print("La capacité maximale des colonnes est présente")
-            copie_proposition[capacite_max_colonnes[0]][capacite_max_colonnes[1]] = capacite_max_colonnes[2]
-            # On mets des 0 dans le reste de la colonne
-            print(copie_proposition[:-1,capacite_max_colonnes[1]])
-            copie_proposition[:-1,capacite_max_colonnes[1]] = 0
+        copie_proposition[case_capacite_max[0],case_capacite_max[1]] = case_capacite_max[3] # On remplit la case de coût minimal avec la capacité maximale
         
-        afficher_proposition_transport(copie_proposition)
+        provisions[case_capacite_max[0]] -= case_capacite_max[3] # On met à jour les provisions
+        commandes[case_capacite_max[1]] -= case_capacite_max[3] # On met à jour les provisions
 
 def afficher_proposition_transport(matrice):
     # Noms des colonnes

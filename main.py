@@ -29,6 +29,7 @@ while True:
                     afficher_proposition_transport(matrice_NO)
                 elif algo_choisi == "2":
                     decoration_affichage("Algorithme Balas-Hammer")
+                    balas_hammer(couts_unitaires,proposition_transport)
                 elif algo_choisi == "3":
                     print("Vous avez choisi de revenir au menu principal")
                     break
