@@ -1,10 +1,6 @@
 from Type_marche_pied import *
 
 
-# une matrice de quantité
-
-
-# creation of the instances
 def graph_creation(proposition_quantity):
     # print("La matrice des quantités est :")
 
@@ -19,8 +15,8 @@ def graph_creation(proposition_quantity):
         tab_s[i].id_sommet = i
 
     for j in range(number_column):
-        tab_c.append(Sommet_pied("C" + str(j + 1), j+number_row))
-        tab_c[j].id_sommet = len(tab_s)+j
+        tab_c.append(Sommet_pied("C" + str(j + 1), j + number_row))
+        tab_c[j].id_sommet = len(tab_s) + j
 
     # Création des liaisons entre S et C
     for i in range(number_row):
@@ -58,33 +54,14 @@ def graph_creation(proposition_quantity):
     return tab_c, tab_s, tab_sommet_id
 
 
-"""def calcul_nombre_sommet():
-    number_row = len(proposition_quantity)
-    number_column = len(proposition_quantity[0])"""
-
-
-def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
-    # Nous vérifions si graphe contient moins de |V | − 1 arête (|V | étant le nombre de sommets).
-    # Calcul nombre de sommets
+# verifies si le graphe est acyclique
+def acyclique(proposition_quantity, tab_sommet_id):
+    # Nous vérifions s'il y a un cycle
+    # Pour ça on parcourt le graphe en partant de S1
     number_row = len(proposition_quantity)
     number_column = len(proposition_quantity[0])
     nombre_sommet = number_row + number_column
 
-    # Calcul nombre d'arêtes
-    nombre_arêtes = 0
-    for i in range(number_row):
-        for j in range(number_column):
-            if proposition_quantity[i][j] != 0:
-                nombre_arêtes += 1
-
-    # Si oui, il est dégénéré si graphe contient moins de |V | − 1 arête (|V | étant le nombre de sommets).
-    if nombre_arêtes < nombre_sommet - 1:
-        print("Le graphe est dégénéré car le graphe contient moins de |V | − 1 arête (|V | étant le nombre de sommets).")
-
-        return True
-
-    # Nous vérifions s'il y a un cycle
-    # Pour ça on parcourt le graphe en partant de S1
     nombre_de_sommets_a_parcourir = nombre_sommet - 1
     sommet_origine = Sommet_pied("S0", 1000000)
     sommet_actuel = tab_sommet_id[0]
@@ -97,7 +74,7 @@ def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
         return True
 
     # On commence à parcourir le sommet actuel pour savoir où aller
-    while nombre_de_sommets_a_parcourir+1 > 0:
+    while nombre_de_sommets_a_parcourir + 1 > 0:
         # On veut voir où on peut aller
         for i in range(len(sommet_actuel.link_id)):
             # On regarde un sommet dans la liste des sommets
@@ -131,14 +108,86 @@ def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
         nombre_de_sommets_a_parcourir = nombre_de_sommets_a_parcourir - 1
 
         # si la liste des destinations n'est pas vide, alors cycle
+    return False
+
+
+def connexe(proposition_quantity, tab_sommet_id):
+    # Nous vérifions s'il y a un cycle
+    # Pour ça on parcourt le graphe en partant de S1
+    number_row = len(proposition_quantity)
+    number_column = len(proposition_quantity[0])
+    nombre_sommet = number_row + number_column
+    # On commence à 1 car il faut prendre en compte le sommet S0
+    compteur_sommets = 1
+    nombre_de_sommets_a_parcourir = nombre_sommet - 1
+    sommet_origine = Sommet_pied("S0", 1000000)
+    sommet_actuel = tab_sommet_id[0]
+    sommet_actuel.parent = sommet_origine
+    sommets_supr_nom = []
+    trajet_envisageable = []
+
+
+    # On commence à parcourir le sommet actuel pour savoir où aller
+    while nombre_de_sommets_a_parcourir + 1 > 0:
+        # On veut voir où on peut aller
+        for i in range(len(sommet_actuel.link_id)):
+            # On regarde un sommet dans la liste des sommets
+            # On ne va pas dans le sommet prédécesseur
+            # ajout dans trajet envisageable d'un element qui n'est pas le prédécesseur
+            index = sommet_actuel.link_id[i]
+            prochain_sommet_nom = tab_sommet_id[index]
+            prochain_sommet_nom.parent = sommet_actuel
+            # On check si le prochain sommet n'est pas le prédécesseur (parent)
+
+            if prochain_sommet_nom != sommet_actuel.parent:
+                # Si le prochain sommet n'est pas un parent, mais est un sommet où on est passé
+                if prochain_sommet_nom not in sommets_supr_nom:
+                    trajet_envisageable.append(prochain_sommet_nom.id_sommet)
+
+        # Maintenant qu'on a ajouté depuis notre somme ceux à quoi il est relié
+        # On veut changer le sommet actuel parmi ceux disponibles, changer les sommets sup et set le parent
+        if trajet_envisageable:
+            # On fait effectivement le trajet
+            sommets_supr_nom.append(sommet_actuel)
+            sommet_actuel = tab_sommet_id[trajet_envisageable[0]]
+            trajet_envisageable.pop(0)
+            compteur_sommets += 1
+        nombre_de_sommets_a_parcourir = nombre_de_sommets_a_parcourir - 1
+
+    if compteur_sommets >= nombre_sommet:
+        return True
+    else:
+        return False
+
+
+def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
+    # Nous vérifions si graphe contient moins de |V | − 1 arête (|V | étant le nombre de sommets).
+    # Calcul nombre de sommets
+    number_row = len(proposition_quantity)
+    number_column = len(proposition_quantity[0])
+    nombre_sommet = number_row + number_column
+
+    solution = acyclique(proposition_quantity, tab_sommet_id)
+    if solution:
+        return True
+
+    # Calcul nombre d'arêtes
+    nombre_arêtes = 0
+    for i in range(number_row):
+        for j in range(number_column):
+            if proposition_quantity[i][j] != 0:
+                nombre_arêtes += 1
+
+    # Si oui, il est dégénéré si graphe contient moins de |V | − 1 arête (|V | étant le nombre de sommets).
+    if nombre_arêtes < nombre_sommet - 1:
+        print("Le graphe est dégénéré car le graphe contient moins de |V | − 1 arête (|V | étant le nombre de sommets).")
+        return True
 
     print("Le graphe n'est pas dégénéré")
     return False
 
-
-
 # supprimer du tableau tous_les_sommets ceux où on est déjà passé
 # tous_les_sommets.pop(tous_les_sommets.index(sommet_actuel))
 
-#print("Sommet parcourus : ", sommets_parcourus)
-#print("Sommet actuel : ", sommet_actuel)
+# print("Sommet parcourus : ", sommets_parcourus)
+# print("Sommet actuel : ", sommet_actuel)
