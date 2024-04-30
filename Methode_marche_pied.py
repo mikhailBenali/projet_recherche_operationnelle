@@ -112,57 +112,95 @@ def acyclique(proposition_quantity, tab_sommet_id):
 
 
 def connexe(proposition_quantity, tab_sommet_id):
-    # Nous vérifions s'il y a un cycle
-    # Pour ça on parcourt le graphe en partant de S1
-    number_row = len(proposition_quantity)
-    number_column = len(proposition_quantity[0])
-    nombre_sommet = number_row + number_column
-    # On commence à 1 car il faut prendre en compte le sommet S0
-    compteur_sommets = 1
-    nombre_de_sommets_a_parcourir = nombre_sommet - 1
-    sommet_origine = Sommet_pied("S0", 1000000)
-    sommet_actuel = tab_sommet_id[0]
-    sommet_actuel.parent = sommet_origine
-    sommets_supr_nom = []
-    trajet_envisageable = []
-    tab_part = []
+    compteur_sommets = 0
+    all_non_connex = []
 
-    # On commence à parcourir le sommet actuel pour savoir où aller
-    while nombre_de_sommets_a_parcourir + 1 > 0:
-        # On veut voir où on peut aller
-        for i in range(len(sommet_actuel.link_id)):
-            # On regarde un sommet dans la liste des sommets
-            # On ne va pas dans le sommet prédécesseur
-            # ajout dans trajet envisageable d'un element qui n'est pas le prédécesseur
-            index = sommet_actuel.link_id[i]
-            prochain_sommet_nom = tab_sommet_id[index]
-            prochain_sommet_nom.parent = sommet_actuel
-            # On check si le prochain sommet n'est pas le prédécesseur (parent)
+    reel_quantity = proposition_quantity
+    for i in range(len(tab_sommet_id)):
+        sommet_actuel = tab_sommet_id[i]
+        # Nous vérifions s'il y a un cycle
+        # Pour ça on parcourt le graphe en partant de S1
+        number_row = len(reel_quantity)
+        number_column = len(reel_quantity[0])
+        nombre_sommet = number_row + number_column
+        # On commence à 1 car il faut prendre en compte le sommet S0
+        compteur_sommets = 1
+        nombre_de_sommets_a_parcourir = nombre_sommet - 1
+        sommet_origine = Sommet_pied("S0", 1000000)
 
-            if prochain_sommet_nom != sommet_actuel.parent:
-                # Si le prochain sommet n'est pas un parent, mais est un sommet où on est passé
-                if prochain_sommet_nom not in sommets_supr_nom:
-                    trajet_envisageable.append(prochain_sommet_nom.id_sommet)
+        sommet_actuel.parent = sommet_origine
+        sommets_supr_nom = []
+        trajet_envisageable = []
+        sommets_supr_nom.append(sommet_actuel)
+        # Si ce n'est pas connexe, on stock tout les graphs ici
+        # On commence à parcourir le sommet actuel pour savoir où aller
+        while nombre_de_sommets_a_parcourir + 1 > 0:
+            # On veut voir où on peut aller
+            for j in range(len(sommet_actuel.link_id)):
+                # On regarde un sommet dans la liste des sommets
+                index = sommet_actuel.link_id[j]
+                prochain_sommet_nom = tab_sommet_id[index]
+                prochain_sommet_nom.parent = sommet_actuel
+                # On check si le prochain sommet n'est pas le prédécesseur (parent)
 
-        # Maintenant qu'on a ajouté depuis notre somme ceux à quoi il est relié
-        # On veut changer le sommet actuel parmi ceux disponibles, changer les sommets sup et set le parent
-        if trajet_envisageable:
-            # On fait effectivement le trajet
-            sommets_supr_nom.append(sommet_actuel)
-            sommet_actuel = tab_sommet_id[trajet_envisageable[0]]
-            trajet_envisageable.pop(0)
-            compteur_sommets += 1
-        nombre_de_sommets_a_parcourir = nombre_de_sommets_a_parcourir - 1
+                if prochain_sommet_nom != sommet_actuel.parent:
+                    # Si le prochain sommet n'est pas un parent, mais est un sommet où on est passé
+                    if prochain_sommet_nom not in sommets_supr_nom:
+                        trajet_envisageable.append(prochain_sommet_nom.id_sommet)
 
-    if compteur_sommets >= nombre_sommet:
-        return True
-    else:
-        print(sommets_supr_nom)
-        for i in range(len(sommets_supr_nom)):
-            tab_part.append(sommets_supr_nom[i].nom_sommet)
-        # tab_tempo = connexe(proposition_quantity, (tab_sommet_id - sommets_supr_nom)
-        print(tab_part)
-        return False
+            # Maintenant qu'on a ajouté depuis notre somme ceux à quoi il est relié
+            # On veut changer le sommet actuel parmi ceux disponibles, changer les sommets sup et set le parent
+            if trajet_envisageable:
+                # On fait effectivement le trajet
+                sommet_actuel = tab_sommet_id[trajet_envisageable[0]]
+                sommets_supr_nom.append(sommet_actuel)
+                trajet_envisageable.pop(0)
+                compteur_sommets += 1
+                if compteur_sommets >= nombre_sommet:
+                    print("Sommet actuel avant finito", sommet_actuel.nom_sommet)
+                    return True
+                else:
+                    reel_quantity = [elem for elem in proposition_quantity if elem not in sommets_supr_nom]
+
+
+            nombre_de_sommets_a_parcourir -= 1
+        all_non_connex.append(sommets_supr_nom)
+
+    # On veut supprimer du tableau all_non_connex les doublons
+    # Créer une nouvelle matrice pour stocker les tableaux uniques
+    matrice_sans_doublons = []
+
+    # Parcourir chaque tableau dans la matrice initiale
+    for tableau in all_non_connex:
+        # Vérifier si le tableau est déjà dans la matrice sans doublons
+        tableau_present = False
+        for tableau_unique in matrice_sans_doublons:
+            # Vérifier si les deux tableaux contiennent les mêmes éléments (même dans un ordre différent)
+            if sorted(tableau, key=lambda x: x.id_sommet) == sorted(tableau_unique, key=lambda x: x.id_sommet):
+                tableau_present = True
+                break
+        # Ajouter le tableau à la matrice sans doublons s'il n'est pas déjà présent
+        if not tableau_present:
+            matrice_sans_doublons.append(tableau)
+
+    # Print des sous graphes
+    # Parcourir chaque graphe isolé dans la matrice
+
+    for sous_tableau in matrice_sans_doublons:
+        # Récupérer les noms des sommets dans le sous-tableau
+        noms_sommets = [sommet.nom_sommet for sommet in sous_tableau]
+        # Afficher les noms des sommets
+        print(noms_sommets)
+
+    """for i in range(len(sommets_supr_nom)):
+        print("i", i)
+        tab_part.append(sommets_supr_nom[i].nom_sommet)
+        all_non_connex.append((tab_part))"""
+    # tab_tempo = connexe(proposition_quantity, (tab_sommet_id - sommets_supr_nom)
+    """for i in range(len(all_non_connex)):
+        for j in range(len(all_non_connex[i])):
+            print(all_non_connex)"""
+    return False
 
 
 def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
