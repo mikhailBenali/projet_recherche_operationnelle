@@ -125,6 +125,7 @@ def connexe(proposition_quantity, tab_sommet_id):
     sommet_actuel.parent = sommet_origine
     sommets_supr_nom = []
     trajet_envisageable = []
+    tab_part = []
 
 
     # On commence à parcourir le sommet actuel pour savoir où aller
@@ -157,6 +158,10 @@ def connexe(proposition_quantity, tab_sommet_id):
     if compteur_sommets >= nombre_sommet:
         return True
     else:
+        for i in range(len(sommets_supr_nom)):
+            tab_part.append(sommets_supr_nom[i].nom_sommet)
+        # tab_tempo = connexe(proposition_quantity, tab_sommet_id)
+        print(tab_part)
         return False
 
 
