@@ -23,26 +23,6 @@ def matrice_couts(matrice):
         m[l] = m[l][:-1] # On prend tout sauf la dernière valeur
     return m
 
-def balas_hammer(matrice):
-    copie_matrice = np.array(matrice)
-    
-    # On calcule les pénalités
-    penalites_provisions = []
-    penalites_commandes = []
-    
-    for ligne in copie_matrice:
-        ligne.sort()
-        penalites_provisions.append(ligne[1] - ligne[0])
-    
-    copie_matrice = np.array(matrice)
-    
-    for colonne in np.transpose(copie_matrice):
-        colonne.sort()
-        penalites_commandes.append(colonne[1] - colonne[0])
-    
-    print("Pénalités provisions: ", penalites_provisions)
-    print("Pénalités commandes: ", penalites_commandes)
-
 def afficher_proposition_transport(matrice):
     # Noms des colonnes
     noms_colonnes = []
@@ -62,7 +42,6 @@ def afficher_proposition_transport(matrice):
     print(matrice)
 
 def algo_nord_ouest(proposition_transport,dimensions):
-    print("Rq : Les valeurs du tableau correspondent à la répartition des provisions (ce ne sont pas les coûts unitaires) \n")
     lignes, colonnes = dimensions # Correspond aux dimensions n,m dans la première ligne du fichier de proposition de transport
     solution = [[0] * (colonnes+1) for _ in range(lignes+1)] # Initialisation Matrice de répartitions des quantités
     i, j = 0, 0 # Initialisation des indices de ligne et de colonne
@@ -93,6 +72,32 @@ def algo_nord_ouest(proposition_transport,dimensions):
             j += 1
     
     return solution
+
+def algo_balas_hammer():
+    # ici mettre algo de balas_hammer
+    print("...")
+
+def calcul_cout_total(matrice_cout,proposition_transport,dimensions):
+    lignes,colonnes=dimensions
+    cout_total=0
+    details_cout = ""
+    matrice_proposition = [l[:-1] for l in proposition_transport[:-1]]
+    for i in range (lignes):
+        for j in range (colonnes):
+            if i != lignes - 1 or j != colonnes - 1:
+                cout_partiel = matrice_cout[i][j] * matrice_proposition[i][j]
+                cout_total += cout_partiel
+                if cout_partiel !=0 :
+                    details_cout += f"{matrice_cout[i][j]} × {matrice_proposition[i][j]} + "
+            else:
+                cout_partiel = matrice_cout[i][j] * matrice_proposition[i][j]
+                cout_total += cout_partiel
+                if cout_partiel !=0 :
+                    details_cout += f"{matrice_cout[i][j]} × {matrice_proposition[i][j]}"
+    print("\nDétails du calcul du coût total :")
+    print(details_cout)
+    print(f"Le coût total de la proposition est : {cout_total} €.")
+    return cout_total
     
 def decoration_affichage(message):
     print("\n" + "#"*50 + "\n")
