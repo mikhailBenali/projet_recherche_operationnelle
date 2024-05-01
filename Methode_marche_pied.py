@@ -71,9 +71,9 @@ def acyclique(proposition_quantity, tab_sommet_id):
 
     # Pour retrouver le cycle
     le_cycle = []
-    """# Si le premier sommet n'est relié à rien alors, il est acyclique
+    # Si le premier sommet n'est relié à rien alors, il est acyclique
     if sommet_actuel.link is None:
-        return True"""
+        return True
 
     # On commence à parcourir le sommet actuel pour savoir où aller
     while nombre_de_sommets_a_parcourir + 1 > 0:
@@ -132,9 +132,8 @@ def acyclique(proposition_quantity, tab_sommet_id):
                             sommet_actuel = sommet_actuel.parent
 
                         longueur_a_faire -= 1
-                    print("J'ai pas trouvé le cycle : ", le_cycle)
-                    return True, le_cycle
-
+                    print("J'ai pas trouvé de cycle")
+                    return True
 
                 else:
                     trajet_envisageable.append(prochain_sommet_nom.id_sommet)
@@ -153,13 +152,15 @@ def acyclique(proposition_quantity, tab_sommet_id):
 
         nombre_de_sommets_a_parcourir = nombre_de_sommets_a_parcourir - 1
 
-        # si la liste des destinations n'est pas vide, alors cycle
+    # si la liste des destinations n'est pas vide, alors cycle
+    print("il y a un cycle")
     return False, le_cycle
 
 
 def connexe(proposition_quantity, tab_sommet_id):
     compteur_sommets = 0
     all_non_connex = []
+    empty_tab = []
 
     reel_quantity = proposition_quantity
     for i in range(len(tab_sommet_id)):
@@ -203,7 +204,8 @@ def connexe(proposition_quantity, tab_sommet_id):
                 trajet_envisageable.pop(0)
                 compteur_sommets += 1
                 if compteur_sommets >= nombre_sommet:
-                    return True
+                    return True, empty_tab
+
                 else:
                     reel_quantity = [elem for elem in proposition_quantity if elem not in sommets_supr_nom]
 
@@ -244,7 +246,46 @@ def connexe(proposition_quantity, tab_sommet_id):
     """for i in range(len(all_non_connex)):
         for j in range(len(all_non_connex[i])):
             print(all_non_connex)"""
-    return False
+    return False, matrice_sans_doublons
+
+"""
+def rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c):
+    is_ok_1 = False
+    is_ok_2 = False
+    is_connexe, sous_tableau = connexe(proposition_quantity, tab_sommet_id)
+    # On fait un nombre de liens égal au nombre de different groupes de sommets
+    print("len tab p", len(sous_tableau))
+    for p in range(len(sous_tableau)):
+        print("len tab s", len(tab_s))
+        # Pour parcourir tous les S pour où ajouter
+        for i in range(len(tab_s)):
+            print("i suivant")
+            # Pour parcourir tous les C pour les ajouter
+            # print(len(tab_sommet_id) - len(tab_s))
+            for j in range(len(tab_sommet_id) - len(tab_s)):
+                j += len(tab_s)
+                # Pour parcourir tous les enfants de là où on va ajouter
+                for k in range(len(tab_sommet_id[i].link_id)):
+                    if tab_sommet_id[i].link_id[k] != tab_sommet_id[j].id_sommet:
+                        # On relie les deux
+                        tab_sommet_id[i].link_id.append(tab_sommet_id[j].id_sommet)
+                        tab_sommet_id[j].link_id.append(tab_sommet_id[i].id_sommet)
+                        tab_sommet_id[i].link_id = list(set(tab_sommet_id[i].link_id))
+                        tab_sommet_id[j].link_id = list(set(tab_sommet_id[j].link_id))
+
+                        # Seulement si on ajouté le bon nombre de sommets (3 groupes, 2 liaisons)
+                        if p == len(sous_tableau) - 2:
+                            is_ok_1 = connexe(proposition_quantity, tab_sommet_id)
+                            is_ok_2 = acyclique(proposition_quantity, tab_sommet_id)
+
+                    else:
+                        print('a')
+
+    if is_ok_1:
+        if is_ok_2:
+            return tab_sommet_id
+    print("C'est impossible")
+    return tab_sommet_id"""
 
 
 def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
