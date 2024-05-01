@@ -292,6 +292,9 @@ def supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c):
 
     # On cherche la valeur de l'arrete la plus petite sans compter 0
     tab_sans_zero = [valeur for valeur in tableau_arrete_sommet if valeur != 0]
+    for i in range(len(tab_sans_zero)):
+        print("Condition", i,":" , tab_sans_zero[i])
+    tab_sans_zero = [tab_sans_zero[0], tab_sans_zero[-1]]
     plus_petit = min(tab_sans_zero)
 
     # On a la valeur à soustraire, maintenant, on veut effectivement la soustraire et l'additionner
@@ -299,6 +302,7 @@ def supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c):
     for i in range(nombre_iterations):
         if i % 2 == 0:
             tableau_arrete_sommet[i] -= plus_petit
+
         else:
             tableau_arrete_sommet[i] += plus_petit
 
@@ -318,7 +322,6 @@ def supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c):
                 tableau_arete_nulles.append(le_cycle[i].nom_sommet)
                 tableau_arete_nulles.append(le_cycle[i + 1].nom_sommet)
                 tableau_de_tableau_arete_nulles.append(tableau_arete_nulles)
-
 
     return tableau_de_tableau_arete_nulles
 

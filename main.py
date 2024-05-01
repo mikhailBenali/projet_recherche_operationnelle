@@ -1,7 +1,7 @@
 from fonctions import *
 from Methode_marche_pied import *
 
-proposition_quantity = [[20, 20], [0, 30]]
+proposition_quantity = [[20, 10], [0, 30, 5]]
 
 # Création du graphe à partir du tableau
 tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
