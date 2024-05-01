@@ -50,7 +50,6 @@ def balas_hammer(couts, proposition):
             if not provisions[i] == 0:
                 ligne.sort()
                 penalites_lignes.append(ligne[1] - ligne[0])
-                print(f"Pénalité ligne {i} : {ligne[1] - ligne[0]}")
             else:
                 penalites_lignes.append(0)
         
@@ -60,7 +59,6 @@ def balas_hammer(couts, proposition):
             if not commandes[j] == 0:
                 colonne.sort()
                 penalites_colonnes.append(colonne[1] - colonne[0])
-                print(f"Pénalité colonne {j} : {colonne[1] - colonne[0]}")
             else:
                 penalites_colonnes.append(0)
         
@@ -70,18 +68,12 @@ def balas_hammer(couts, proposition):
         
         # On trouve la plus grande pénalité
         
-        print(f"Pénalités des lignes : {penalites_lignes}")
-        print(f"Pénalités des colonnes : {penalites_colonnes}")
-        
         penalite_max = max(penalites_lignes + penalites_colonnes)
-        print("Pénalité maximale : ", penalite_max)
         
         # On trouve les coordonnées de la pénalité maximale
         
         coord_penalite_max_lignes = [i for i, j in enumerate(penalites_lignes) if j == penalite_max]
-        print("Lignes de pénalité maximale : ", *[i for i in coord_penalite_max_lignes])
         coord_penalite_max_colonnes = [i for i, j in enumerate(penalites_colonnes) if j == penalite_max]
-        print("Colonnes de pénalité maximale : ", *[i for i in coord_penalite_max_colonnes])
         
         coord_cas_cout_min_ligne = []
         coord_case_cout_min_colonne = []
@@ -91,30 +83,20 @@ def balas_hammer(couts, proposition):
             l = copie_couts[ligne].copy()
             l = [(ligne,colonne, l[colonne], min(provisions[ligne],commandes[colonne])) for colonne in range(len(l))] # On ajoute les coordonnées de la case, le coût, et la capacité minimale
             
-            #print(f"l : {l}")
             l_filtre = [tup for tup in l if tup[3] != 0] # On filtre les cases de coût minimal en retirant celles qui ont une capacité nulle
-            #print(f"l_filtre sans capacités nulles: {l_filtre}")
             # On filtre les cases de coût minimal en retirant celles qui ont déjà été remplies ou qui n'ont pas un coût minimal
             l_filtre = [tup for tup in l_filtre if tup[2] == min([tup[2] for tup in l_filtre]) and copie_proposition[tup[0],tup[1]] == 0]
-            #print(f"l_filtre : {l_filtre}")
             coord_cas_cout_min_ligne.extend(l_filtre)
             
         for colonne in coord_penalite_max_colonnes:
             c= np.transpose(copie_couts)[colonne].copy()
             c = [(ligne,colonne,c[ligne],min(provisions[ligne],commandes[colonne])) for ligne in range(len(c))]
             
-            #print(f"c : {c}")
             c_filtre = [tup for tup in c if tup[3] != 0]
-            #print(f"c_filtre sans capacités nulles: {c_filtre}")
             c_filtre = [tup for tup in c_filtre if tup[2] == min([tup[2] for tup in c_filtre]) and copie_proposition[tup[0],tup[1]] == 0]
-            #print(f"c_filtre : {c_filtre}")
             coord_case_cout_min_colonne.extend(c_filtre)
         
-        print(f"Cases de coût minimal dans les lignes de pénalité maximale : {coord_cas_cout_min_ligne}")
-        print(f"Cases de coût minimal dans les colonnes de pénalité maximale : {coord_case_cout_min_colonne}")
-        
         case_capacite_max = max(coord_cas_cout_min_ligne + coord_case_cout_min_colonne, key=lambda x:x[3])
-        print(f"Case de capacité maximale : \n\nX : {case_capacite_max[0]}, Y : {case_capacite_max[1]}, Coût : {case_capacite_max[2]}, Capacité : {case_capacite_max[3]}\n")
         
         copie_proposition[case_capacite_max[0],case_capacite_max[1]] = case_capacite_max[3] # On remplit la case de coût minimal avec la capacité maximale
         
@@ -125,9 +107,6 @@ def balas_hammer(couts, proposition):
         copie_proposition[-1,-1] = copie_proposition[:-1,:-1].sum()
         copie_proposition[:,-1] = provisions
         copie_proposition[-1,:] = commandes
-        
-        afficher_proposition_transport(copie_proposition)
-        input()
         
     # On remet les valeurs des provisions et des commandes ainsi que la somme totale
     copie_proposition[:,-1] = provisions_initiales
