@@ -38,11 +38,6 @@ def balas_hammer(couts, proposition):
     provisions = provisions_initiales.copy()
     commandes = commandes_initiales.copy()
     
-    def provisions_nulles(provisions,case):
-        return provisions[case[0]] == 0
-    def commandes_nulles(commandes,case):
-        return commandes[case[1]] == 0
-    
     while copie_proposition[:-1,:-1].sum() != total:
         
         # On calcule les pénalités
@@ -52,18 +47,20 @@ def balas_hammer(couts, proposition):
         # On calcule les pénalités des lignes et des colonnes
         
         for i,ligne in enumerate(copie_couts):
-            if not any(provisions_nulles(provisions,(i,j)) for j in range(len(ligne))) and provisions[i] != 0:
+            if not provisions[i] == 0:
                 ligne.sort()
                 penalites_lignes.append(ligne[1] - ligne[0])
+                print(f"Pénalité ligne {i} : {ligne[1] - ligne[0]}")
             else:
                 penalites_lignes.append(0)
         
         copie_couts = np.array(couts)
         
         for j,colonne in enumerate(np.transpose(copie_couts)):
-            if not any(provisions_nulles(provisions,(i,j)) for i in range(len(colonne))) and commandes[j] != 0:
+            if not commandes[j] == 0:
                 colonne.sort()
                 penalites_colonnes.append(colonne[1] - colonne[0])
+                print(f"Pénalité colonne {j} : {colonne[1] - colonne[0]}")
             else:
                 penalites_colonnes.append(0)
         
@@ -73,13 +70,13 @@ def balas_hammer(couts, proposition):
         
         # On trouve la plus grande pénalité
         
+        print(f"Pénalités des lignes : {penalites_lignes}")
+        print(f"Pénalités des colonnes : {penalites_colonnes}")
+        
         penalite_max = max(penalites_lignes + penalites_colonnes)
         print("Pénalité maximale : ", penalite_max)
         
         # On trouve les coordonnées de la pénalité maximale
-        
-        print(f"Pénalités des lignes : {penalites_lignes}")
-        print(f"Pénalités des colonnes : {penalites_colonnes}")
         
         coord_penalite_max_lignes = [i for i, j in enumerate(penalites_lignes) if j == penalite_max]
         print("Lignes de pénalité maximale : ", *[i for i in coord_penalite_max_lignes])
@@ -90,29 +87,27 @@ def balas_hammer(couts, proposition):
         coord_case_cout_min_colonne = []
         
         for ligne in coord_penalite_max_lignes:
+            
             l = copie_couts[ligne].copy()
-            l = [(ligne,colonne, l[colonne], min(provisions[ligne],commandes[colonne])) for colonne in range(len(l))]
-            l_filtre = []
-            for t in l:
-                print(f"t[0] : {t[0]}, t[1] : {t[1]}, t[2] : {t[2]}, t[3] : {t[3]}")
-                if t[3] == 0: # Si la capacité est nulle
-                    l.remove(t)
-            print(f"L : {l}")
-            for t in l:
-                if t[2] == min([t[2] for t in l]) and copie_proposition[t[0],t[1]] == 0: # Si le coût est minimal et que la case n'est pas remplie et que la capacité est non nulle
-                    l_filtre.append(t)
+            l = [(ligne,colonne, l[colonne], min(provisions[ligne],commandes[colonne])) for colonne in range(len(l))] # On ajoute les coordonnées de la case, le coût, et la capacité minimale
+            
+            #print(f"l : {l}")
+            l_filtre = [tup for tup in l if tup[3] != 0] # On filtre les cases de coût minimal en retirant celles qui ont une capacité nulle
+            #print(f"l_filtre sans capacités nulles: {l_filtre}")
+            # On filtre les cases de coût minimal en retirant celles qui ont déjà été remplies ou qui n'ont pas un coût minimal
+            l_filtre = [tup for tup in l_filtre if tup[2] == min([tup[2] for tup in l_filtre]) and copie_proposition[tup[0],tup[1]] == 0]
+            #print(f"l_filtre : {l_filtre}")
             coord_cas_cout_min_ligne.extend(l_filtre)
             
         for colonne in coord_penalite_max_colonnes:
             c= np.transpose(copie_couts)[colonne].copy()
             c = [(ligne,colonne,c[ligne],min(provisions[ligne],commandes[colonne])) for ligne in range(len(c))]
-            c_filtre = []
-            for t in c:
-                if t[3] == 0: # Si la capacité est nulle
-                    l.remove(t)
-            for t in c:
-                if t[2] == min([t[2] for t in c]) and copie_proposition[t[0],t[1]] == 0:
-                    c_filtre.append(t)
+            
+            #print(f"c : {c}")
+            c_filtre = [tup for tup in c if tup[3] != 0]
+            #print(f"c_filtre sans capacités nulles: {c_filtre}")
+            c_filtre = [tup for tup in c_filtre if tup[2] == min([tup[2] for tup in c_filtre]) and copie_proposition[tup[0],tup[1]] == 0]
+            #print(f"c_filtre : {c_filtre}")
             coord_case_cout_min_colonne.extend(c_filtre)
         
         print(f"Cases de coût minimal dans les lignes de pénalité maximale : {coord_cas_cout_min_ligne}")
