@@ -189,6 +189,8 @@ def calcul_cout_total(matrice_cout,proposition_transport,dimensions):
     print(f"Le coût total de la proposition est : {cout_total} €.")
     return cout_total
 
+
+
 def decoration_affichage(message):
     print("\n" + "#"*50 + "\n")
     print(message)
