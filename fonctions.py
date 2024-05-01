@@ -178,12 +178,15 @@ def calcul_cout_total(matrice_cout,proposition_transport,dimensions):
                 cout_partiel = matrice_cout[i][j] * matrice_proposition[i][j]
                 cout_total += cout_partiel
                 if cout_partiel !=0 :
-                    details_cout += f"{matrice_cout[i][j]} × {matrice_proposition[i][j]} + "
+                    if (i,j) == (0,0):
+                        details_cout += f"{matrice_cout[i][j]} × {matrice_proposition[i][j]}"
+                    else:
+                        details_cout += f" + {matrice_cout[i][j]} × {matrice_proposition[i][j]}"
             else:
                 cout_partiel = matrice_cout[i][j] * matrice_proposition[i][j]
                 cout_total += cout_partiel
                 if cout_partiel !=0 :
-                    details_cout += f"{matrice_cout[i][j]} × {matrice_proposition[i][j]}"
+                    details_cout += f" + {matrice_cout[i][j]} × {matrice_proposition[i][j]}"
     print("\nDétails du calcul du coût total :")
     print(details_cout)
     print(f"Le coût total de la proposition est : {cout_total} €.")
