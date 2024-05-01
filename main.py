@@ -32,12 +32,10 @@ while True:
                     cout_total=calcul_cout_total(couts_unitaires,matrice_NO,dimensions)
                 elif algo_choisi == "2":
                     decoration_affichage("====== ALGORITHME BALAS-HAMMER ======\n")
-                    matrice_BH=algo_balas_hammer()
+                    matrice_BH=algo_balas_hammer(couts_unitaires,proposition_transport)
                     print("Rq : Les valeurs du tableau correspondent aux QUANTITÉS \n")
-                    """
                     afficher_proposition_transport(matrice_BH)
                     cout_total=calcul_cout_total(couts_unitaires,matrice_BH,dimensions)
-                    """
                 elif algo_choisi == "3":
                     print("Vous avez choisi de revenir au menu principal")
                     break
