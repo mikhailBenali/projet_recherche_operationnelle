@@ -3,7 +3,10 @@ import numpy as np
 import random as rd
 
 proposition = []
-proposition = []
+
+def decoration_affichage(message):
+    print("\n" + "#"*50 + "\n")
+    print(message)
 
 def lecture_proposition(fichier):
     m = []
@@ -34,7 +37,7 @@ def afficher_proposition_transport(matrice):
     # Noms des lignes
     noms_lignes = []
     for j in range(len(matrice)):
-        noms_lignes.append(f'P{j+1}')
+        noms_lignes.append(f'S{j+1}')
     matrice=pd.DataFrame(matrice, columns=noms_colonnes, index=noms_lignes)
 
     provisions = matrice.columns[-1]
@@ -189,8 +192,43 @@ def calcul_cout_total(matrice_cout,proposition_transport,dimensions):
     print(f"Le coût total de la proposition est : {cout_total} €.")
     return cout_total
 
+def capacite_case(x,y,proposition):
+    return min(proposition[x][-1],proposition[-1][y])
 
+def couts_potentiels(couts,proposition):
+    
+    # On parcourt les lignes et les colonnes de la matrice de proposition
+    # On stocke les indices des cases non nulles leur coût et leur demande
+    
+    arretes = []
+    
+    for i in range(len(proposition)-1):
+        for j in range(len(proposition[i])-1):
+            if proposition[i][j] != 0:
+                arretes.append((i,j,proposition[i][j]))
+    # On initialise les listes A (coefficients des variables) et B (résultats des équations)
+    A = np.zeros((len(couts)+len(couts[0]),len(couts)+len(couts[0])))
+    B = []
+    
+    for i in range(len(arretes)):
+        x,y,d = arretes[i]
+        A[i][x] = 1
+        A[i][y+len(couts)] = -1
+        B.append(d)
+    
+    # On définit le coût potentiel de la première case à 0
+    A[-1][0] = 1 
+    B.append(0)
+    
+    solution = np.linalg.solve(A,B)
+    
+    couts_pot = np.zeros((len(couts),len(couts[0])))
+    
+    for i in range(len(couts)):
+        for j in range(len(couts[i])):
+            couts_pot[i][j] = solution[i] - solution[j+len(couts)]
+    
+    return couts_pot
 
-def decoration_affichage(message):
-    print("\n" + "#"*50 + "\n")
-    print(message)
+def couts_marginaux(couts,couts_potentiels):
+    return [couts[i][j] - couts_potentiels[i][j] for i in range(len(couts)) for j in range(len(couts[i]))]

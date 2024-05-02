@@ -1,14 +1,20 @@
 from fonctions import *
 
+couts_unitaires = None
+proposition_transport = None
+matrice_NO = None
+matrice_BH = None
+
 while True:
     decoration_affichage("MENU PRINCIPAL :")
-    print("1. Tester une proposition de problème de transport")
-    print("2. Quitter")
+    print("1. Initialiser une proposition de problème de transport")
+    print("2. Appliquer la méthode du marche-pied")
+    print("3. Quitter")
 
     choix = input("Entrez votre choix : ")
 
     if choix == "1":
-        num_proposition = int(input("Entrer le n° de proposition de problème de transport à tester (entre 1 et 12) : "))
+        num_proposition = int(input("Entrer le n° de proposition de problème de transport à initialiser (entre 1 et 12) : "))
         if 1 <= num_proposition <= 12:
             file_name= f'Propositions/proposition {num_proposition}.txt'
             decoration_affichage(f'Problème de transport N°{num_proposition}: \n')
@@ -45,6 +51,17 @@ while True:
         else:
             print("Numéro de proposition de problème de transport invalide. Veuillez entrer un numéro entre 1 et 12.")
     elif choix == "2":
+        if couts_unitaires is not None:
+            if matrice_BH is not None:
+                couts_pot = couts_potentiels(couts_unitaires,matrice_BH)
+            else:
+                couts_pot = couts_potentiels(couts_unitaires,matrice_NO)
+            couts_marg = couts_marginaux(couts_unitaires,couts_pot)
+            
+        else:
+            print("Veuillez d'abord initialiser une proposition de problème de transport.")
+            continue
+    elif choix == "3":
         print("Au revoir !")
         break
     else:
