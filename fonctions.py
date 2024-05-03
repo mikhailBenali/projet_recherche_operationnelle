@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import random as rd
+import time
 
 proposition = []
 
@@ -65,6 +66,8 @@ def algo_nord_ouest(proposition_transport,dimensions):
     i, j = 0, 0  # Réinitialisation des indices de ligne et de colonne
     while i < lignes and j < colonnes:  # On va remplir le coin en haut à gauche au max à chaque itérations
         # On assigne la quantité à transporter selon les provisions et les commandes
+        print(pd.DataFrame(proposition_transport_copie))
+        print(pd.DataFrame(solution))
         quantite = min(proposition_transport_copie[i][-1], proposition_transport_copie[-1][j])
         solution[i][j] = quantite
         # Pour mettre à jour les stocks disponibles
@@ -235,3 +238,20 @@ def couts_potentiels(couts,proposition):
 
 def couts_marginaux(couts,couts_potentiels):
     return [couts[i][j] - couts_potentiels[i][j] for i in range(len(couts)) for j in range(len(couts[i]))]
+
+def creations_matrice(dimension):
+    m = np.random.randint(1,100,(dimension,dimension))
+    
+    for i in range(dimension):
+        m[i][-1] = sum(m[i][:-1]) # On remplit les provisions
+    m[-1] = [sum(m[:-1,j]) for j in range(dimension)] # On remplit les commandes
+    m[-1][-1] = sum(m[-1][:-1]) # On remplit la somme totale
+    
+    return m
+
+def mesure_temps_execution(fonction, *args):
+    debut = time.time()
+    fonction(*args)
+    fin = time.time()
+    print(f"Temps d'exécution de l'{fonction.__name__}: {fin-debut} secondes.")
+    return fin-debut

@@ -5,11 +5,21 @@ proposition_transport = None
 matrice_NO = None
 matrice_BH = None
 
+complexites_NO = []
+complexites_BH = []
+complexites_marche_pied_NO = []
+complexites_marche_pied_BH = []
+
+# Dimension des matrices à tester pour la complexité
+# ,40,100,400,1000,4000,10000
+valeurs_n_a_tester = [10] 
+
 while True:
     decoration_affichage("MENU PRINCIPAL :")
     print("1. Initialiser une proposition de problème de transport")
     print("2. Appliquer la méthode du marche-pied")
-    print("3. Quitter")
+    print("3. Étude de la complexité")
+    print("4. Quitter")
 
     choix = input("Entrez votre choix : ")
 
@@ -57,11 +67,18 @@ while True:
             else:
                 couts_pot = couts_potentiels(couts_unitaires,matrice_NO)
             couts_marg = couts_marginaux(couts_unitaires,couts_pot)
-            
+            mat = creations_matrice(10)
         else:
             print("Veuillez d'abord initialiser une proposition de problème de transport.")
             continue
     elif choix == "3":
+        # On calcule la complexité
+        for dimension in valeurs_n_a_tester:
+            for i in range(100):
+                couts_random = creations_matrice(dimension)
+                complexites_NO.append(mesure_temps_execution(algo_nord_ouest, couts_random, (dimension,dimension)))
+                complexites_BH.append(mesure_temps_execution(algo_balas_hammer, matrice_couts(couts_random), matrice_couts(couts_random)))
+    elif choix == "4":
         print("Au revoir !")
         break
     else:
