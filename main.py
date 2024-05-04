@@ -4,71 +4,8 @@ from Methode_marche_pied import *
 proposition_couts = [[5, 6, 7], [1, 9, 7]]
 proposition_quantity = [[60, 20, 0], [10, 10, 0]]
 
-# Création du graphe à partir du tableau
-print("Création du graphe et des sommets :")
-tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
-print("\n")
 
-# Vérification si cyclique
-# Premier appel à acyclique
-acyclique_result, le_cycle = acyclique(proposition_quantity, tab_sommet_id)
-print("Il est cyclique :", not acyclique_result)
-
-if not acyclique_result:
-    # S'il n'est pas cyclique
-    # Affichage du cycle
-    print("Voici son cycle :")
-    for sommet in le_cycle:
-        print(sommet.nom_sommet, " ", end='')
-    print("\n")
-
-    # On supprime alors une arête
-    print("Suppression des arêtes :")
-    tableau_arete_nulles = supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c)
-    print("Voici les arrêtes supprimées :", tableau_arete_nulles)
-
-    print("Voici notre nouvelle proposition :", proposition_quantity)
-    tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
-    # On vérifie de nouveau s'il est cyclique
-    the_acyclique_result, the_le_cycle = acyclique(proposition_quantity, tab_sommet_id)
-
-    print("Il est cyclique :", not the_acyclique_result)
-print("\n")
-
-
-# Vérification si connexe
-est_connexe, sous_tableau = connexe(proposition_quantity, tab_sommet_id)
-print("Il est connexe :", est_connexe)
-# Affichage des liens
-if est_connexe == False:
-    # Affichage des graphes
-    print("Voici les sous graphes.")
-    print("\n")
-    for i in range(len(sous_tableau)):
-        for j in range(len(sous_tableau[i])):
-            print(sous_tableau[i][j].nom_sommet, end=' ')
-        print("\n")
-    print("On le rend connexe.")
-
-    # Rendre connexe
-    tab_sommet_id = rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau)
-
-    # Affichage du nouveau graphe
-    print("Voici les nouveaux liens")
-    for p in range(len(tab_s)):
-        print(tab_sommet_id[p].nom_sommet)
-        print(tab_sommet_id[p].link)
-print("\n")
-
-
-# Vérification si dégénérée
-degenere, pourquoi = verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id)
-print("Il est dégénéré :", degenere)
-print(pourquoi)
-print("\n")
-
-
-
+proposition_quantity = methode_du_marche_pied(proposition_quantity)
 
 # Création d'une arête nulle
 """for i in range(len(tab_s)):

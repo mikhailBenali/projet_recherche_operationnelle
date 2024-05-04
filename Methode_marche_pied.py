@@ -360,42 +360,68 @@ def rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_table
     return tab_sommet_id
 
 
+def methode_du_marche_pied(proposition_quantity):
+    # Création du graphe à partir du tableau
+    print("Création du graphe et des sommets :")
+    tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
+    print("\n")
+
+    # Vérification si cyclique
+    # Premier appel à acyclique
+    acyclique_result, le_cycle = acyclique(proposition_quantity, tab_sommet_id)
+    print("Il est cyclique :", not acyclique_result)
+
+    if not acyclique_result:
+        # S'il n'est pas cyclique
+        # Affichage du cycle
+        print("Voici son cycle :")
+        for sommet in le_cycle:
+            print(sommet.nom_sommet, " ", end='')
+        print("\n")
+
+        # On supprime alors une arête
+        print("Suppression des arêtes :")
+        tableau_arete_nulles = supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c)
+        print("Voici les arrêtes supprimées :", tableau_arete_nulles)
+
+        print("Voici notre nouvelle proposition :", proposition_quantity)
+        tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
+        # On vérifie de nouveau s'il est cyclique
+        the_acyclique_result, the_le_cycle = acyclique(proposition_quantity, tab_sommet_id)
+
+        print("Il est cyclique :", not the_acyclique_result)
+    print("\n")
 
 
-        # Pour parcourir tous les S pour où ajouter
+    # Vérification si connexe
+    est_connexe, sous_tableau = connexe(proposition_quantity, tab_sommet_id)
+    print("Il est connexe :", est_connexe)
+    # Affichage des liens
+    if est_connexe == False:
+        # Affichage des graphes
+        print("Voici les sous graphes.")
+        print("\n")
+        for i in range(len(sous_tableau)):
+            for j in range(len(sous_tableau[i])):
+                print(sous_tableau[i][j].nom_sommet, end=' ')
+            print("\n")
+        print("On le rend connexe.")
 
-"""for i in range(nombre_iterations):
-    if le_cycle[0].nom_sommet.startswith("S"):
-        if i % 2 == 0:
-            tableau_arrete_sommet[i] += 10
-            print(tableau_arrete_sommet[i])
-        else:
-            tableau_arrete_sommet[i] -= 10
-            print(tableau_arrete_sommet[i])
-    else:
-        if i % 2 == 0:
-            tableau_arrete_sommet[i] += 10
-            print(tableau_arrete_sommet[i])
-        else:
-            tableau_arrete_sommet[i] -= 10
-            print(tableau_arrete_sommet[i])"""
+        # Rendre connexe
+        tab_sommet_id = rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau)
 
-""" debut_arrete_cycle = le_cycle[i].id_sommet
-fin_arrete_cycle = le_cycle[i + 1].id_sommet
-# On veut savoir si le premier commence par un C ou un S
-    debut_arrete_cycle_vrai = tab_sommet_id[debut_arrete_cycle]
-    fin_arrete_cycle_vrai = tab_sommet_id[fin_arrete_cycle]
-    proposition_quantity[debut_arrete_cycle_vrai][fin_arrete_cycle_vrai]
-else:
-    debut_arrete_cycle_vrai = len(tab_sommet_id[debut_arrete_cycle]) + len(tab_s)
-    fin_arrete_cycle_vrai = len(tab_sommet_id[fin_arrete_cycle])
-    valeur_de_mon_arrete = proposition_quantity[debut_arrete_cycle_vrai][fin_arrete_cycle_vrai]
-print(valeur_de_mon_arrete)
-
-"""
-
-# Une fois qu'on a récupéré dans la liste générale on regarde sa valeur dans le tableau
+        # Affichage du nouveau graphe
+        print("Voici les nouveaux liens")
+        for p in range(len(tab_s)):
+            print(tab_sommet_id[p].nom_sommet)
+            print(tab_sommet_id[p].link)
+    print("\n")
 
 
-# S'il commence par un C on sait qu'il faut chercher dans la deuxième partie du tableau
-# On a donc récupérer leur réel emplacement dans tab_sommet_id et on peut retrouver les bons sommets
+    # Vérification si dégénérée
+    degenere, pourquoi = verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id)
+    print("Il est dégénéré :", degenere)
+    print(pourquoi)
+    print("\n")
+
+    return proposition_quantity
