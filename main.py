@@ -1,11 +1,16 @@
 from fonctions import *
 from Methode_marche_pied import *
 
-proposition_couts = [[5, 6, 7], [1, 9, 7]]
-proposition_quantity = [[60, 20, 0], [10, 10, 0]]
+"""proposition_couts = [[5,7,8],[6,8,5],[6,7,7]]
+proposition_quantity = [[25,0,0,25],[10,15,0,25],[0,5,20,25],[35,20,20,75]]
+cout_pot=[[5,7,7],[6,8,8],[5,7,7]]"""
 
 
-proposition_quantity = methode_du_marche_pied(proposition_quantity)
+proposition_couts= [[11, 12, 10, 10], [17, 16, 15, 18], [19, 21, 20, 22]]
+proposition_quantity= [[50, 10, 0, 0], [0, 30, 0, 0], [0, 35, 30, 25]]
+cout_pot= [[11, 12, 11, 13], [15, 16, 15, 17], [20, 21, 20, 22]]
+
+proposition_quantity = methode_du_marche_pied(proposition_quantity, proposition_couts)
 
 # Création d'une arête nulle
 """for i in range(len(tab_s)):
@@ -20,11 +25,6 @@ for j in range(len(tab_c)):
 print("Création du fake sommet à 0 entre S2 et C1")
 tab_sommet_id[2].link_id.append(tab_sommet_id[1].id_sommet)
 tab_sommet_id[1].link_id.append(tab_sommet_id[2].id_sommet)"""
-
-
-
-
-
 
 """while True:
 
