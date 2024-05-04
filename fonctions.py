@@ -191,8 +191,14 @@ def capacite_case(x,y,proposition):
     return min(proposition[x][-1],proposition[-1][y])
 
 def couts_potentiels(couts,proposition):
-    decoration_affichage("====== Calcul des potentiels ====== ")
-    
+    decoration_affichage("====== Calcul des potentiels ======")
+    print("\n=> Système linéaire pour le calcul des potentiels :")
+    # Affichage du système linéaire
+    for i in range(len(proposition)-1):
+        for j in range(len(proposition[i])-1):
+            if proposition[i][j] != 0:
+                print(f"E(S{i+1}) - E(C{chr(97+j)}) = {couts[i][j]}")
+
     # On parcourt les lignes et les colonnes de la matrice de proposition
     # On stocke les indices des cases non nulles leur coût et leur demande
     
@@ -216,6 +222,7 @@ def couts_potentiels(couts,proposition):
     # On définit le coût potentiel de la première case à 0
     A[-1][0] = 1 
     B.append(0)
+    print("E(S1) = 0")
     
     solution = np.linalg.solve(A,B)
     
@@ -224,20 +231,30 @@ def couts_potentiels(couts,proposition):
     for i in range(len(couts)):
         for j in range(len(couts[i])):
             couts_pot[i][j] = solution[i] - solution[j+len(couts)]
+
+    print("\n=> Résolution du système linéaire :")
+    # Affichage de la résolution du système
+    for i in range(len(couts)):
+        print(f"E(S{i+1}) = {int(solution[i])}")
+    print("E(Ca) =", int(solution[len(couts)]))
+    for i in range(1, len(proposition)-1):
+        print(f"E(C{chr(97 + i)}) =", int(solution[len(couts)+i]))
     
+    print("\n=> Matrice des coûts potentiels :\n")
+    tab_couts_pot=pd.DataFrame(couts_pot.astype(int), index=[f"S{i+1}" for i in range(len(couts))], columns=[f"C{chr(97+i)}" for i in range(len(couts[0]))])
+    print(tab_couts_pot)
     return couts_pot
 
 def couts_marginaux(couts,couts_potentiels):
+    "return [couts[i][j] - couts_potentiels[i][j] for i in range(len(couts)) for j in range(len(couts[i]))]"
     couts_marg = []
     for i in range(len(couts)):
         row = []
         for j in range(len(couts[i])):
-            cout_marginal = couts[i][j] - couts_potentiels[i][j]
+            cout_marginal = int(couts[i][j] - couts_potentiels[i][j])
             row.append(cout_marginal)
         couts_marg.append(row)
+    print("\n=> Matrice des coûts marginaux :\n")
+    tab_couts_marg=pd.DataFrame(couts_marg, index=[f"S{i+1}" for i in range(len(couts))], columns=[f"C{chr(97+i)}" for i in range(len(couts[0]))])
+    print(tab_couts_marg)
     return couts_marg
-    "return [couts[i][j] - couts_potentiels[i][j] for i in range(len(couts)) for j in range(len(couts[i]))]"
-
-def table_cout(couts_pot):
-    print()
-    return

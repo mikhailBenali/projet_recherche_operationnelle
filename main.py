@@ -13,9 +13,10 @@ while True:
 
     choix = input("Entrez votre choix : ")
 
+    # RESOLUTION PB DE TRANSPORT
     if choix == "1":
         num_proposition = int(input("Entrer le n° de proposition de problème de transport à initialiser (entre 1 et 12) : "))
-        if 1 <= num_proposition <= 13:
+        if 1 <= num_proposition <= 12:
             file_name= f'Propositions/proposition {num_proposition}.txt'
             decoration_affichage(f'Problème de transport N°{num_proposition}: \n')
             proposition_transport,dimensions=lecture_proposition(file_name)
@@ -50,6 +51,7 @@ while True:
                     continue
         else:
             print("Numéro de proposition de problème de transport invalide. Veuillez entrer un numéro entre 1 et 12.")
+    # MARCHE PIED AVEC CALCULS COUTS POTENTIELS & MARGINAUX
     elif choix == "2":
         while True:
                 decoration_affichage("Choisissez l'algorithme :")
@@ -60,7 +62,7 @@ while True:
 
                 if algo_choisi == "1":
                     num_proposition = int(input("Entrer le n° de proposition de problème de transport à initialiser (entre 1 et 12) : "))
-                    if 1 <= num_proposition <= 13:
+                    if 1 <= num_proposition <= 12:
                         file_name= f'Propositions/proposition {num_proposition}.txt'
                         decoration_affichage(f'Problème de transport N°{num_proposition}: \n')
                         print("Rq : Les valeurs du tableau correspondent aux COÛTS \n")
@@ -73,8 +75,6 @@ while True:
                         afficher_proposition_transport(matrice_NO)
                         couts_pot = couts_potentiels(couts_unitaires,matrice_NO)
                         couts_marg = couts_marginaux(couts_unitaires,couts_pot)
-                        print(couts_pot)
-                        print(couts_marg)
                 elif algo_choisi == "2":
                     num_proposition = int(input("Entrer le n° de proposition de problème de transport à initialiser (entre 1 et 12) : "))
                     if 1 <= num_proposition <= 13:
@@ -90,8 +90,6 @@ while True:
                         afficher_proposition_transport(matrice_BH)
                         couts_pot = couts_potentiels(couts_unitaires,matrice_BH)
                         couts_marg = couts_marginaux(couts_unitaires,couts_pot)
-                        print(couts_pot)
-                        print(couts_marg)
                 elif algo_choisi == "3":
                     print("Vous avez choisi de revenir au menu principal")
                     break
