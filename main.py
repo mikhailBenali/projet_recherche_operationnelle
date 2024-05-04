@@ -21,19 +21,6 @@ print("Création du fake sommet à 0 entre S2 et C1")
 tab_sommet_id[2].link_id.append(tab_sommet_id[1].id_sommet)
 tab_sommet_id[1].link_id.append(tab_sommet_id[2].id_sommet)"""
 
-
-
-
-
-
-"""while True:
-
-
-couts_unitaires = None
-proposition_transport = None
-matrice_NO = None
-matrice_BH = None
-
 while True:
     decoration_affichage("MENU PRINCIPAL :")
     print("1. Initialiser une proposition de problème de transport")
