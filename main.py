@@ -23,6 +23,16 @@ tab_sommet_id[1].link_id.append(tab_sommet_id[2].id_sommet)"""
 
 
 
+
+
+
+
+
+
+couts_unitaires = None
+proposition_transport = None
+matrice_NO = None
+matrice_BH = None
 while True:
     decoration_affichage("MENU PRINCIPAL :")
     print("1. Initialiser une proposition de problème de transport")
@@ -41,7 +51,7 @@ while True:
             print("Rq : Les valeurs du tableau correspondent aux COÛTS \n")
             afficher_proposition_transport(proposition_transport)
             couts_unitaires=matrice_couts(proposition_transport)
-            
+
             while True:
                 decoration_affichage("Choisissez l'algorithme :")
                 print("1. Nord-Ouest")
@@ -128,5 +138,4 @@ while True:
         print("Au revoir !")
         break
     else:
-
         print("Choix invalide. Veuillez entrer 1 ou 2.")

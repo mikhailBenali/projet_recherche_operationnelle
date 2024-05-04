@@ -1,5 +1,7 @@
 from Type_marche_pied import *
+import pandas as pd
 import numpy as np
+
 
 def graph_creation(proposition_quantity):
     print("proposition_quantity Avant :", proposition_quantity)
@@ -367,68 +369,196 @@ def rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_table
     return tab_sommet_id
 
 
-def methode_du_marche_pied(proposition_quantity):
-    # Création du graphe à partir du tableau
-    print("Création du graphe et des sommets :")
-    tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
-    print("\n")
+def couts_potentiels(couts, proposition):
+    print(proposition)
+    # decoration_affichage("====== Calcul des potentiels ======")
+    print("\n=> Système linéaire pour le calcul des potentiels :")
+    # Affichage du système linéaire
+    for i in range(len(proposition) - 1):
+        for j in range(len(proposition[i]) - 1):
+            if proposition[i][j] != 0:
+                print(f"E(S{i + 1}) - E(C{j + 1}) = {couts[i][j]}")
 
-    # Vérification si cyclique
-    # Premier appel à acyclique
-    acyclique_result, le_cycle = acyclique(proposition_quantity, tab_sommet_id)
-    print("Il est cyclique :", not acyclique_result)
+    # On parcourt les lignes et les colonnes de la matrice de proposition
+    # On stocke les indices des cases non nulles leur coût et leur demande
 
-    if not acyclique_result:
-        # S'il n'est pas cyclique
-        # Affichage du cycle
-        print("Voici son cycle :")
-        for sommet in le_cycle:
-            print(sommet.nom_sommet, " ", end='')
-        print("\n")
+    arretes = []
 
-        # On supprime alors une arête
-        print("Suppression des arêtes :")
-        tableau_arete_nulles = supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c)
-        print("Voici les arrêtes supprimées :", tableau_arete_nulles)
+    for i in range(len(proposition) - 1):
+        for j in range(len(proposition[i]) - 1):
+            if proposition[i][j] != 0:
+                arretes.append((i, j, couts[i][j]))
 
-        print("Voici notre nouvelle proposition :", proposition_quantity)
+    # On initialise les listes A (coefficients des variables) et B (résultats des équations)
+    A = np.zeros((len(couts) + len(couts[0]), len(couts) + len(couts[0])))
+    B = []
+
+    for i in range(len(arretes)):
+        x, y, d = arretes[i]
+        A[i][x] = 1
+        A[i][y + len(couts)] = -1
+        B.append(d)
+
+    # On définit le coût potentiel de la première case à 0
+    A[-1][0] = 1
+    B.append(0)
+    print("E(S1) = 0")
+
+
+    print("A", A)
+    print("B", B)
+
+    solution = np.linalg.solve(A, B)
+
+    couts_pot = np.zeros((len(couts), len(couts[0])))
+
+    for i in range(len(couts)):
+        for j in range(len(couts[i])):
+            couts_pot[i][j] = solution[i] - solution[j + len(couts)]
+
+    print("\n=> Résolution du système linéaire :")
+    # Affichage de la résolution du système
+    for i in range(len(couts)):
+        print(f"E(S{i + 1}) =", int(solution[i]))
+    for i in range(len(proposition) - 1):
+        print(f"E(C{i + 1}) =", int(solution[len(couts) + i]))
+
+    print("\n=> Matrice des coûts potentiels :\n")
+    tab_couts_pot = pd.DataFrame(couts_pot.astype(int), index=[f"S{i + 1}" for i in range(len(couts))],
+                                 columns=[f"C{i + 1}" for i in range(len(couts[0]))])
+    print(tab_couts_pot)
+    return couts_pot
+
+
+def couts_marginaux(couts,couts_potentiels):
+    "return [couts[i][j] - couts_potentiels[i][j] for i in range(len(couts)) for j in range(len(couts[i]))]"
+    couts_marg = []
+    for i in range(len(couts)):
+        row = []
+        for j in range(len(couts[i])):
+            cout_marginal = int(couts[i][j] - couts_potentiels[i][j])
+            row.append(cout_marginal)
+        couts_marg.append(row)
+    print("\n=> Matrice des coûts marginaux :\n")
+    tab_couts_marg=pd.DataFrame(couts_marg, index=[f"S{i+1}" for i in range(len(couts))], columns=[f"C{i+1}" for i in range(len(couts[0]))])
+    print(tab_couts_marg)
+    return couts_marg
+
+
+def verif_cout_marginal_positif(couts_marginaux):
+    for i in range(len(couts_marginaux)):
+        for j in range(len(couts_marginaux[i])):
+            if couts_marginaux[i][j] < 0:
+                return False
+    return True
+
+
+def methode_du_marche_pied(proposition_quantity, proposition_couts):
+    cout_marginal_negatif = True
+    while cout_marginal_negatif:
+        # Création du graphe à partir du tableau
+        print("Création du graphe et des sommets :")
         tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
-        # On vérifie de nouveau s'il est cyclique
-        the_acyclique_result, the_le_cycle = acyclique(proposition_quantity, tab_sommet_id)
-
-        print("Il est cyclique :", not the_acyclique_result)
-    print("\n")
-
-
-    # Vérification si connexe
-    est_connexe, sous_tableau = connexe(proposition_quantity, tab_sommet_id)
-    print("Il est connexe :", est_connexe)
-    # Affichage des liens
-    if est_connexe == False:
-        # Affichage des graphes
-        print("Voici les sous graphes.")
         print("\n")
-        for i in range(len(sous_tableau)):
-            for j in range(len(sous_tableau[i])):
-                print(sous_tableau[i][j].nom_sommet, end=' ')
+
+        # Vérification si cyclique
+        # Premier appel à acyclique
+        acyclique_result, le_cycle = acyclique(proposition_quantity, tab_sommet_id)
+        print("Il est cyclique :", not acyclique_result)
+
+        if not acyclique_result:
+            # S'il n'est pas cyclique
+            # Affichage du cycle
+            print("Voici son cycle :")
+            for sommet in le_cycle:
+                print(sommet.nom_sommet, " ", end='')
             print("\n")
-        print("On le rend connexe.")
 
-        # Rendre connexe
-        tab_sommet_id = rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau)
+            # On supprime alors une arête
+            print("Suppression des arêtes :")
+            tableau_arete_nulles = supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c)
+            print("Voici les arrêtes supprimées :", tableau_arete_nulles)
 
-        # Affichage du nouveau graphe
-        print("Voici les nouveaux liens")
-        for p in range(len(tab_s)):
-            print(tab_sommet_id[p].nom_sommet)
-            print(tab_sommet_id[p].link)
-    print("\n")
+            print("Voici notre nouvelle proposition :", proposition_quantity)
+            tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
+            # On vérifie de nouveau s'il est cyclique
+            the_acyclique_result, the_le_cycle = acyclique(proposition_quantity, tab_sommet_id)
 
+            print("Il est cyclique :", not the_acyclique_result)
+        print("\n")
 
-    # Vérification si dégénérée
-    degenere, pourquoi = verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id)
-    print("Il est dégénéré :", degenere)
-    print(pourquoi)
-    print("\n")
+        # Vérification si connexe
+        est_connexe, sous_tableau = connexe(proposition_quantity, tab_sommet_id)
+        print("Il est connexe :", est_connexe)
+        # Affichage des liens
+        if est_connexe == False:
+            # Affichage des graphes
+            print("Voici les sous graphes.")
+            print("\n")
+            for i in range(len(sous_tableau)):
+                for j in range(len(sous_tableau[i])):
+                    print(sous_tableau[i][j].nom_sommet, end=' ')
+                print("\n")
+            print("On le rend connexe.")
+
+            # Rendre connexe
+            tab_sommet_id = rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau)
+
+            # Affichage du nouveau graphe
+            print("Voici les nouveaux liens")
+            for p in range(len(tab_s)):
+                print(tab_sommet_id[p].nom_sommet)
+                print(tab_sommet_id[p].link)
+        print("\n")
+
+        # Vérification si dégénérée
+        degenere, pourquoi = verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id)
+        print("Il est dégénéré :", degenere)
+        print(pourquoi)
+        print("\n")
+
+        # Calcul des coûts potentiels
+        cout_pot = couts_potentiels(proposition_couts, proposition_quantity)
+        # Calcul des coûts marginaux
+        couts_marge = couts_marginaux(proposition_couts, cout_pot)
+        # Tant qu'on a des couts marginaux négatifs
+        cout_marginal_negatif = not verif_cout_marginal_positif(couts_marge)
+        if cout_marginal_negatif:
+            # On rend la proposition optimisée
+            tab_sommet_id = rendre_optimise(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau, couts_marge)
 
     return proposition_quantity
+
+
+def rendre_optimise(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau, couts_marge):
+    # On cherche quelle arête ajouter
+    cout_min_possible = 10000000
+    ligne, colonne = 0, 0
+    for i in range(len(couts_marge)):
+        for j in range(len(couts_marge[i])):
+            if proposition_quantity[i][j] == 0:
+                if couts_marge[i][j] < cout_min_possible:
+                    print("FEUR")
+                    ligne, colonne = i, j
+                    cout_min_possible = couts_marge[i][j]
+
+    # Maintenant qu'on a l'emplacement de l'arête, on l'ajoute
+    # On veut ajouter une arête vide
+    print("Cout minim", cout_min_possible)
+
+    tab_sommet_id[ligne].link_id.append(tab_sommet_id[ligne + len(tab_s) + 1].id_sommet)
+    tab_sommet_id[ligne].link.append(tab_sommet_id[ligne + len(tab_s) + 1].nom_sommet)
+
+    tab_sommet_id[ligne + len(tab_s) + 1].link_id.append(tab_sommet_id[ligne].id_sommet)
+    tab_sommet_id[ligne + len(tab_s) + 1].link.append(tab_sommet_id[ligne].nom_sommet)
+
+    for p in range(len(tab_sommet_id)):
+        print(tab_sommet_id[p].nom_sommet)
+        print(tab_sommet_id[p].link)
+
+    return tab_sommet_id
+
+
+
+
+
