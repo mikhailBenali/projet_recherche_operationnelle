@@ -43,18 +43,17 @@ def graph_creation(proposition_quantity):
         print(tab_s[p].nom_sommet)
         print(tab_s[p].link)
 
-    for m in range(len(tab_c)):
+    """for m in range(len(tab_c)):
         print(tab_c[m].nom_sommet)
-        print(tab_c[m].link)
+        print(tab_c[m].link)"""
 
-    print("Tableau groupé")
+    """print("Tableau groupé")
     for o in range(len(tab_sommet_id)):
         print(tab_sommet_id[o].id_sommet)
-        print(tab_sommet_id[o].link_id)
+        print(tab_sommet_id[o].link_id)"""
     return tab_c, tab_s, tab_sommet_id
 
 
-# verifies si le graphe est acyclique
 def acyclique(proposition_quantity, tab_sommet_id):
     # Nous vérifions s'il y a un cycle
     # Pour ça on parcourt le graphe en partant de S1
@@ -62,7 +61,7 @@ def acyclique(proposition_quantity, tab_sommet_id):
     number_column = len(proposition_quantity[0])
     nombre_sommet = number_row + number_column
 
-    nombre_de_sommets_a_parcourir = nombre_sommet - 1
+    nombre_de_sommets_a_parcourir = nombre_sommet
     sommet_origine = Sommet_pied("S0", 1000000)
     sommet_actuel = tab_sommet_id[0]
     sommet_actuel.parent = sommet_origine
@@ -71,12 +70,12 @@ def acyclique(proposition_quantity, tab_sommet_id):
 
     # Pour retrouver le cycle
     le_cycle = []
-    # Si le premier sommet n'est relié à rien alors, il est acyclique
+    """# Si le premier sommet n'est relié à rien alors, il est acyclique
     if sommet_actuel.link is None:
-        return True
+        return True"""
 
     # On commence à parcourir le sommet actuel pour savoir où aller
-    while nombre_de_sommets_a_parcourir + 1 > 0:
+    while nombre_de_sommets_a_parcourir > 0:
         # On veut voir où on peut aller
         for i in range(len(sommet_actuel.link_id)):
             # On regarde un sommet dans la liste des sommets
@@ -96,19 +95,17 @@ def acyclique(proposition_quantity, tab_sommet_id):
                     le_sommet_de_base_du_cycle = sommet_actuel
                     le_cycle.append(le_sommet_de_base_du_cycle)
                     longueur_a_faire = len(sommets_supr_nom)
+                    print(le_cycle[i].nom_sommet)
+
                     # On fait ça pour tous les sommets qu'on a parcourus pour trouver s'il y avait un cycle
-                    while longueur_a_faire + 1 > 0:
-                        """print("longeure a faire", longueur_a_faire)
-                        print("Le sommet actuel est : ", sommet_actuel.nom_sommet)"""
+                    while longueur_a_faire > 0:
                         # On regarde si le sommet actuel a un enfant. Sinon il ne fait pas partie du cycle
                         if len(sommet_actuel.link_id) > 1:
-                            """print("La liste des enfants : ", sommet_actuel.link_id)"""
                             # On cherche le premier enfant uniquement (le vrai sommet pas juste son id)
-                            """print(sommets_supr_nom)"""
                             index = sommet_actuel.link_id[0]
                             prochain_sommet_nom = tab_sommet_id[index]
                             prochain_sommet_nom.parent = sommet_actuel
-                            # Si le sommet où on se dirige est le parant, on recommence et on supprime le lien
+                            # Si le sommet où on se dirige est le parent, on recommence et on supprime le lien
                             if prochain_sommet_nom == sommet_actuel.parent:
                                 temporaire = sommet_actuel.link_id[0]
                                 sommet_actuel.link_id.pop(0)
@@ -125,6 +122,7 @@ def acyclique(proposition_quantity, tab_sommet_id):
                             le_cycle.append(sommet_actuel)
 
                         else:
+                            print(sommet_actuel.nom_sommet)
                             # j'ai un doute que ce truc fonctionne
                             # On supprime le sommet des sommets restants et du cycle
                             sommets_supr_nom.remove(sommet_actuel)
@@ -132,8 +130,8 @@ def acyclique(proposition_quantity, tab_sommet_id):
                             sommet_actuel = sommet_actuel.parent
 
                         longueur_a_faire -= 1
-                    print("J'ai pas trouvé de cycle")
-                    return True
+                    print("J'ai pas trouvé le cycle : ", le_cycle)
+                    return True, le_cycle
 
                 else:
                     trajet_envisageable.append(prochain_sommet_nom.id_sommet)
@@ -152,8 +150,7 @@ def acyclique(proposition_quantity, tab_sommet_id):
 
         nombre_de_sommets_a_parcourir = nombre_de_sommets_a_parcourir - 1
 
-    # si la liste des destinations n'est pas vide, alors cycle
-    print("il y a un cycle")
+        # si la liste des destinations n'est pas vide, alors cycle
     return False, le_cycle
 
 
@@ -295,8 +292,8 @@ def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
     number_column = len(proposition_quantity[0])
     nombre_sommet = number_row + number_column
 
-    solution, le_cycle = acyclique(proposition_quantity, tab_sommet_id)
-    if solution:
+    solution = acyclique(proposition_quantity, tab_sommet_id)
+    if not solution:
         print("Le graphe est dégénéré car il contient un cycle.")
         return True
 
