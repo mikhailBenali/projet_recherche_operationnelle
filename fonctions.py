@@ -256,3 +256,10 @@ def couts_marginaux(couts,couts_potentiels):
     tab_couts_marg=pd.DataFrame(couts_marg, index=[f"S{i+1}" for i in range(len(couts))], columns=[f"C{i+1}" for i in range(len(couts[0]))])
     print(tab_couts_marg)
     return couts_marg
+
+def verif_cout_marginal_positif(couts_marginaux):
+    for i in range(len(couts_marginaux)):
+        for j in range(len(couts_marginaux[i])):
+            if proposition[i][j] < 0:
+                return False
+    return True
