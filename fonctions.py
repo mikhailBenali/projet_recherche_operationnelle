@@ -173,7 +173,6 @@ def algo_balas_hammer(couts, proposition):
 def calcul_cout_total(matrice_cout,proposition_transport,dimensions):
     lignes,colonnes=dimensions
     cout_total=0
-    details_cout = ""
     matrice_proposition = [l[:-1] for l in proposition_transport[:-1]]
     print("\nDétails du calcul du coût total :")
     for i in range (lignes):
