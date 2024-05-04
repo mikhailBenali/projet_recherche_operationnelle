@@ -1,4 +1,33 @@
 from fonctions import *
+from Methode_marche_pied import *
+
+proposition_couts = [[5, 6, 7], [1, 9, 7]]
+proposition_quantity = [[60, 20, 0], [10, 10, 0]]
+
+
+proposition_quantity = methode_du_marche_pied(proposition_quantity)
+
+# Création d'une arête nulle
+"""for i in range(len(tab_s)):
+    print("Link de :", tab_sommet_id[i].nom_sommet)
+    print(tab_sommet_id[i].link_id)
+for j in range(len(tab_c)):
+    j += len(tab_s)
+    print("Link de :", tab_sommet_id[j].nom_sommet)
+    print(tab_sommet_id[j].link_id)"""
+"""
+# Je créé temporairement une arrête nulle en dure S2 C1
+print("Création du fake sommet à 0 entre S2 et C1")
+tab_sommet_id[2].link_id.append(tab_sommet_id[1].id_sommet)
+tab_sommet_id[1].link_id.append(tab_sommet_id[2].id_sommet)"""
+
+
+
+
+
+
+"""while True:
+
 
 couts_unitaires = None
 proposition_transport = None
@@ -100,4 +129,5 @@ while True:
         print("Au revoir !")
         break
     else:
+
         print("Choix invalide. Veuillez entrer 1 ou 2.")
