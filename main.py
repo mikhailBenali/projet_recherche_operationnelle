@@ -1,15 +1,11 @@
 from fonctions import *
 from Methode_marche_pied import *
 
-proposition_quantity = [[20, 20, 20], [0, 30, 40]]
+proposition_quantity = [[10, 20, 30], [0, 10, 30]]
 
 # Création du graphe à partir du tableau
 tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
 
-
-# Vérification si dégénérée
-degenere = verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id)
-print("Il est dégénéré :", degenere)
 
 # Vérification si cyclique
 acyclique, le_cycle = acyclique(proposition_quantity, tab_sommet_id)
@@ -18,6 +14,10 @@ if not acyclique:
     for sommet in le_cycle:
         print(sommet.nom_sommet, " ", end='')
     print("\n")
+
+# Vérification si dégénérée
+degenere = verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id)
+print("Il est dégénéré :", degenere)
 
 # Vérification si connexe
 connexe, sous_tableau = connexe(proposition_quantity, tab_sommet_id)
