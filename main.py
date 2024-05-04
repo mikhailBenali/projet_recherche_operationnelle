@@ -1,12 +1,12 @@
 from fonctions import *
 from Methode_marche_pied import *
 
-proposition_couts = [[5, 6, 7], [1, 9, 7]]
+"""proposition_couts = [[5, 6, 7], [1, 9, 7]]
 proposition_quantity = [[60, 20, 0], [10, 10, 0]]
 
 
 proposition_quantity = methode_du_marche_pied(proposition_quantity)
-
+"""
 # Création d'une arête nulle
 """for i in range(len(tab_s)):
     print("Link de :", tab_sommet_id[i].nom_sommet)
@@ -33,7 +33,6 @@ couts_unitaires = None
 proposition_transport = None
 matrice_NO = None
 matrice_BH = None
-
 while True:
     decoration_affichage("MENU PRINCIPAL :")
     print("1. Initialiser une proposition de problème de transport")
@@ -104,9 +103,15 @@ while True:
                         afficher_proposition_transport(matrice_NO)
                         couts_pot = couts_potentiels(couts_unitaires,matrice_NO)
                         couts_marg = couts_marginaux(couts_unitaires,couts_pot)
+                        while not(verif_cout_marginal_positif(couts_marg)):
+                            matrice_NO=methode_du_marche_pied(matrice_NO)
+                            couts_pot = couts_potentiels(couts_unitaires,matrice_NO)
+                            couts_marg = couts_marginaux(couts_unitaires,couts_pot)
+                            
+
                 elif algo_choisi == "2":
                     num_proposition = int(input("Entrer le n° de proposition de problème de transport à initialiser (entre 1 et 12) : "))
-                    if 1 <= num_proposition <= 13:
+                    if 1 <= num_proposition <= 12:
                         file_name= f'Propositions/proposition {num_proposition}.txt'
                         decoration_affichage(f'Problème de transport N°{num_proposition}: \n')
                         print("Rq : Les valeurs du tableau correspondent aux COÛTS \n")
@@ -119,6 +124,10 @@ while True:
                         afficher_proposition_transport(matrice_BH)
                         couts_pot = couts_potentiels(couts_unitaires,matrice_BH)
                         couts_marg = couts_marginaux(couts_unitaires,couts_pot)
+                        while not(verif_cout_marginal_positif(couts_marg)):
+                            matrice_BH=methode_du_marche_pied(matrice_BH)
+                            couts_pot = couts_potentiels(couts_unitaires,matrice_BH)
+                            couts_marg = couts_marginaux(couts_unitaires,couts_pot)
                 elif algo_choisi == "3":
                     print("Vous avez choisi de revenir au menu principal")
                     break
