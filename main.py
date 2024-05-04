@@ -91,8 +91,10 @@ while True:
                         matrice_NO=algo_nord_ouest(proposition_transport,dimensions)
                         print("Rq : Les valeurs du tableau correspondent aux QUANTITÉS \n")
                         afficher_proposition_transport(matrice_NO)
-                        while not(verif_cout_marginal_positif):
-                            proposition_transport=methode_du_marche_pied(proposition_transport)
+                        couts_pot = couts_potentiels(couts_unitaires,matrice_NO)
+                        couts_marg = couts_marginaux(couts_unitaires,couts_pot)
+                        while not(verif_cout_marginal_positif(couts_marg)):
+                            matrice_NO=methode_du_marche_pied(matrice_NO)
                             couts_pot = couts_potentiels(couts_unitaires,matrice_NO)
                             couts_marg = couts_marginaux(couts_unitaires,couts_pot)
                             
@@ -110,9 +112,11 @@ while True:
                         matrice_BH=algo_balas_hammer(couts_unitaires,proposition_transport)
                         print("Rq : Les valeurs du tableau correspondent aux QUANTITÉS \n")
                         afficher_proposition_transport(matrice_BH)
-                        while not(verif_cout_marginal_positif):
-                            proposition_transport=methode_du_marche_pied(proposition_transport)
-                            couts_pot = couts_potentiels(couts_unitaires,matrice_NO)
+                        couts_pot = couts_potentiels(couts_unitaires,matrice_BH)
+                        couts_marg = couts_marginaux(couts_unitaires,couts_pot)
+                        while not(verif_cout_marginal_positif(couts_marg)):
+                            matrice_BH=methode_du_marche_pied(matrice_BH)
+                            couts_pot = couts_potentiels(couts_unitaires,matrice_BH)
                             couts_marg = couts_marginaux(couts_unitaires,couts_pot)
                 elif algo_choisi == "3":
                     print("Vous avez choisi de revenir au menu principal")

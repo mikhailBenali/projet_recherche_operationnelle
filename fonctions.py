@@ -168,6 +168,7 @@ def algo_balas_hammer(couts, proposition):
     copie_proposition[-1,:] = commandes_initiales
     copie_proposition[-1,-1] = total
     
+    copie_proposition=copie_proposition.tolist()
     return copie_proposition
 
 def calcul_cout_total(matrice_cout,proposition_transport,dimensions):
@@ -260,6 +261,6 @@ def couts_marginaux(couts,couts_potentiels):
 def verif_cout_marginal_positif(couts_marginaux):
     for i in range(len(couts_marginaux)):
         for j in range(len(couts_marginaux[i])):
-            if proposition[i][j] < 0:
+            if couts_marginaux[i][j] < 0:
                 return False
     return True

@@ -2,11 +2,13 @@ from Type_marche_pied import *
 import numpy as np
 
 def graph_creation(proposition_quantity):
+    print("proposition_quantity Avant :", proposition_quantity)
+
     proposition_quantity = proposition_quantity[:-1]
     for i in range(len(proposition_quantity)):
         proposition_quantity[i] = proposition_quantity[i][:-1]
 
-    print("proposition_quantity :", proposition_quantity)
+    print("proposition_quantity Après :", proposition_quantity)
     # print("La matrice des quantités est :")
 
     # Création de "S" et "C"
