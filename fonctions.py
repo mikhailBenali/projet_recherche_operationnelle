@@ -175,30 +175,23 @@ def calcul_cout_total(matrice_cout,proposition_transport,dimensions):
     cout_total=0
     details_cout = ""
     matrice_proposition = [l[:-1] for l in proposition_transport[:-1]]
+    print("\nDétails du calcul du coût total :")
     for i in range (lignes):
         for j in range (colonnes):
-            if i != lignes - 1 or j != colonnes - 1:
-                cout_partiel = matrice_cout[i][j] * matrice_proposition[i][j]
+            cout_partiel = matrice_cout[i][j] * matrice_proposition[i][j]
+            if cout_partiel != 0:
                 cout_total += cout_partiel
-                if cout_partiel !=0 :
-                    if (i,j) == (0,0):
-                        details_cout += f"{matrice_cout[i][j]} × {matrice_proposition[i][j]}"
-                    else:
-                        details_cout += f" + {matrice_cout[i][j]} × {matrice_proposition[i][j]}"
-            else:
-                cout_partiel = matrice_cout[i][j] * matrice_proposition[i][j]
-                cout_total += cout_partiel
-                if cout_partiel !=0 :
-                    details_cout += f" + {matrice_cout[i][j]} × {matrice_proposition[i][j]}"
-    print("\nDétails du calcul du coût total :")
-    print(details_cout)
-    print(f"Le coût total de la proposition est : {cout_total} €.")
+                if cout_total != cout_partiel:  # Vérif si ce n'est pas la première valeur ajoutée
+                    print(" + ", end="")
+                print(f"{matrice_cout[i][j]} × {matrice_proposition[i][j]}", end="")
+    print(f"\nLe coût total de la proposition est : {cout_total} €.")
     return cout_total
 
 def capacite_case(x,y,proposition):
     return min(proposition[x][-1],proposition[-1][y])
 
 def couts_potentiels(couts,proposition):
+    decoration_affichage("====== Calcul des potentiels ====== ")
     
     # On parcourt les lignes et les colonnes de la matrice de proposition
     # On stocke les indices des cases non nulles leur coût et leur demande
@@ -208,7 +201,8 @@ def couts_potentiels(couts,proposition):
     for i in range(len(proposition)-1):
         for j in range(len(proposition[i])-1):
             if proposition[i][j] != 0:
-                arretes.append((i,j,proposition[i][j]))
+                arretes.append((i,j,couts[i][j]))
+    
     # On initialise les listes A (coefficients des variables) et B (résultats des équations)
     A = np.zeros((len(couts)+len(couts[0]),len(couts)+len(couts[0])))
     B = []
@@ -234,4 +228,16 @@ def couts_potentiels(couts,proposition):
     return couts_pot
 
 def couts_marginaux(couts,couts_potentiels):
-    return [couts[i][j] - couts_potentiels[i][j] for i in range(len(couts)) for j in range(len(couts[i]))]
+    couts_marg = []
+    for i in range(len(couts)):
+        row = []
+        for j in range(len(couts[i])):
+            cout_marginal = couts[i][j] - couts_potentiels[i][j]
+            row.append(cout_marginal)
+        couts_marg.append(row)
+    return couts_marg
+    "return [couts[i][j] - couts_potentiels[i][j] for i in range(len(couts)) for j in range(len(couts[i]))]"
+
+def table_cout(couts_pot):
+    print()
+    return
