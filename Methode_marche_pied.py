@@ -250,45 +250,6 @@ def connexe(proposition_quantity, tab_sommet_id):
             print(all_non_connex)"""
     return False, matrice_sans_doublons
 
-"""
-def rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c):
-    is_ok_1 = False
-    is_ok_2 = False
-    is_connexe, sous_tableau = connexe(proposition_quantity, tab_sommet_id)
-    # On fait un nombre de liens égal au nombre de different groupes de sommets
-    print("len tab p", len(sous_tableau))
-    for p in range(len(sous_tableau)):
-        print("len tab s", len(tab_s))
-        # Pour parcourir tous les S pour où ajouter
-        for i in range(len(tab_s)):
-            print("i suivant")
-            # Pour parcourir tous les C pour les ajouter
-            # print(len(tab_sommet_id) - len(tab_s))
-            for j in range(len(tab_sommet_id) - len(tab_s)):
-                j += len(tab_s)
-                # Pour parcourir tous les enfants de là où on va ajouter
-                for k in range(len(tab_sommet_id[i].link_id)):
-                    if tab_sommet_id[i].link_id[k] != tab_sommet_id[j].id_sommet:
-                        # On relie les deux
-                        tab_sommet_id[i].link_id.append(tab_sommet_id[j].id_sommet)
-                        tab_sommet_id[j].link_id.append(tab_sommet_id[i].id_sommet)
-                        tab_sommet_id[i].link_id = list(set(tab_sommet_id[i].link_id))
-                        tab_sommet_id[j].link_id = list(set(tab_sommet_id[j].link_id))
-
-                        # Seulement si on ajouté le bon nombre de sommets (3 groupes, 2 liaisons)
-                        if p == len(sous_tableau) - 2:
-                            is_ok_1 = connexe(proposition_quantity, tab_sommet_id)
-                            is_ok_2 = acyclique(proposition_quantity, tab_sommet_id)
-
-                    else:
-                        print('a')
-
-    if is_ok_1:
-        if is_ok_2:
-            return tab_sommet_id
-    print("C'est impossible")
-    return tab_sommet_id"""
-
 
 def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
     # Nous vérifions si graphe contient moins de |V | − 1 arête (|V | étant le nombre de sommets).
@@ -297,9 +258,14 @@ def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
     number_column = len(proposition_quantity[0])
     nombre_sommet = number_row + number_column
 
-    solution, pas_important_1 = acyclique(proposition_quantity, tab_sommet_id)
+    solution, le_cycle = acyclique(proposition_quantity, tab_sommet_id)
     if solution == False:
         pourquoi = "Le graphe est dégénéré car il contient un cycle."
+        # Affichage du cycle
+        print("Voici son cycle :")
+        for sommet in le_cycle:
+            print(sommet.nom_sommet, " ", end='')
+        print("\n")
         return True, pourquoi
 
     # Calcul nombre d'arêtes
@@ -310,18 +276,17 @@ def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
                 nombre_arêtes += 1
 
     connexe_result, pas_important2 = connexe(proposition_quantity, tab_sommet_id)
-    print("connexe_result", connexe_result)
     if connexe_result == False:
         pourquoi = "Le graphe est dégénéré car n'est pas connexe"
         return True, pourquoi
 
     # Si oui, il est dégénéré si graphe contient moins de |V| − 1 arête (|V | étant le nombre de sommets).
-    if nombre_arêtes < nombre_sommet - 1:
+    """if nombre_arêtes < nombre_sommet - 1:
         pourquoi = "Le graphe est dégénéré car le graphe contient moins de |V| − 1 arête (|V| étant le nombre de sommets)."
-        return True, pourquoi
+        return True, pourquoi"""
 
     # print("Le graphe n'est pas dégénéré")
-    pourquoi = "Car il n'est pas dégénéré"
+    pourquoi = ""
     return False, pourquoi
 
 
@@ -375,6 +340,29 @@ def supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c):
 
     return tableau_de_tableau_arete_nulles
 
+
+def rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau):
+    # On fait un nombre de liens égal au nombre de different groupes de sommets
+    for p in range(len(sous_tableau) - 1):
+        # Si le premier element du sous tableau est un S
+        if sous_tableau[p][0].nom_sommet.startswith("S"):
+            # Alors on le relie avec un C
+            # On regarde touts le éléments de tout les tableaux jusqu'à tomber sur un C
+            for j in range(len(sous_tableau) - 1):
+                j += 1
+                for k in range(len(sous_tableau[j])):
+                    if sous_tableau[j][k].nom_sommet.startswith("C"):
+                        tab_sommet_id[sous_tableau[j][k].id_sommet].link_id.append(sous_tableau[p][0].id_sommet)
+                        tab_sommet_id[sous_tableau[j][k].id_sommet].link.append(sous_tableau[p][0].nom_sommet)
+                        tab_sommet_id[sous_tableau[p][0].id_sommet].link_id.append(sous_tableau[j][k].id_sommet)
+                        tab_sommet_id[sous_tableau[p][0].id_sommet].link.append(sous_tableau[j][k].nom_sommet)
+
+    return tab_sommet_id
+
+
+
+
+        # Pour parcourir tous les S pour où ajouter
 
 """for i in range(nombre_iterations):
     if le_cycle[0].nom_sommet.startswith("S"):
