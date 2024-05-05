@@ -194,8 +194,9 @@ def couts_potentiels(couts,proposition):
     decoration_affichage("====== Calcul des potentiels ======")
     print("\n=> Système linéaire pour le calcul des potentiels :")
     # Affichage du système linéaire
-    for i in range(len(proposition)-1):
-        for j in range(len(proposition[i])-1):
+    for i in range(len(proposition)):
+        for j in range(len(proposition[i])):
+            
             if proposition[i][j] != 0:
                 print(f"E(S{i+1}) - E(C{j+1}) = {couts[i][j]}")
 
@@ -204,26 +205,30 @@ def couts_potentiels(couts,proposition):
     
     arretes = []
     
-    for i in range(len(proposition)-1):
-        for j in range(len(proposition[i])-1):
+    for i in range(len(proposition)):
+        for j in range(len(proposition[i])):
             if proposition[i][j] != 0:
                 arretes.append((i,j,couts[i][j]))
     
     # On initialise les listes A (coefficients des variables) et B (résultats des équations)
     A = np.zeros((len(couts)+len(couts[0]),len(couts)+len(couts[0])))
     B = []
-    
+    print("prop=",proposition)
+    print("arretes=", arretes)
     for i in range(len(arretes)):
         x,y,d = arretes[i]
         A[i][x] = 1
         A[i][y+len(couts)] = -1
         B.append(d)
     
+    
     # On définit le coût potentiel de la première case à 0
     A[-1][0] = 1 
     B.append(0)
     print("E(S1) = 0")
     
+    print("A=",A)
+    print("B=",B)
     solution = np.linalg.solve(A,B)
     
     couts_pot = np.zeros((len(couts),len(couts[0])))

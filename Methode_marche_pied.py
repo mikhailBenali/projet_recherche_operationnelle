@@ -1,7 +1,7 @@
 from Type_marche_pied import *
+from fonctions import *
 import pandas as pd
 import numpy as np
-
 
 def reduction(proposition_quantity):
     print("proposition_quantity Avant :", proposition_quantity)
@@ -14,10 +14,7 @@ def reduction(proposition_quantity):
 
     return proposition_quantity
 
-
 def graph_creation(proposition_quantity):
-    # print("La matrice des quantités est :")
-
     # Création de "S" et "C"
     number_row = len(proposition_quantity)
     number_column = len(proposition_quantity[0])
@@ -114,7 +111,7 @@ def acyclique(proposition_quantity, tab_sommet_id):
                     longueur_a_faire = len(sommets_supr_nom)
 
                     # On fait ça pour tous les sommets qu'on a parcourus pour trouver le cycle
-                    while longueur_a_faire + 2 > 0:
+                    while longueur_a_faire + 30 > 0:
                         # On regarde si le sommet actuel a un enfant. Sinon il ne fait pas partie du cycle
                         if len(sommet_actuel.link_id) > 1:
                             # On cherche le premier enfant uniquement (le vrai sommet pas juste son id)
@@ -305,8 +302,7 @@ def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
 
 
 def supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c):
-   # if arrete_a_supr != None:
-
+    print("cycle :",le_cycle)
     tableau_arrete_sommet = []
     tableau_arete_nulles = []
     tableau_de_tableau_arete_nulles = []
@@ -379,98 +375,22 @@ def rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_table
     return tab_sommet_id
 
 
-def couts_potentiels(couts, proposition):
-    print(proposition)
-    # decoration_affichage("====== Calcul des potentiels ======")
-    print("\n=> Système linéaire pour le calcul des potentiels :")
-    # Affichage du système linéaire
-    for i in range(len(proposition) - 1):
-        for j in range(len(proposition[i]) - 1):
-            if proposition[i][j] != 0:
-                print(f"E(S{i + 1}) - E(C{j + 1}) = {couts[i][j]}")
-
-    # On parcourt les lignes et les colonnes de la matrice de proposition
-    # On stocke les indices des cases non nulles leur coût et leur demande
-
-    arretes = []
-
-    for i in range(len(proposition) - 1):
-        for j in range(len(proposition[i]) - 1):
-            if proposition[i][j] != 0:
-                arretes.append((i, j, couts[i][j]))
-
-    # On initialise les listes A (coefficients des variables) et B (résultats des équations)
-    A = np.zeros((len(couts) + len(couts[0]), len(couts) + len(couts[0])))
-    B = []
-
-    for i in range(len(arretes)):
-        x, y, d = arretes[i]
-        A[i][x] = 1
-        A[i][y + len(couts)] = -1
-        B.append(d)
-
-    # On définit le coût potentiel de la première case à 0
-    A[-1][0] = 1
-    B.append(0)
-    print("E(S1) = 0")
-
-
-    print("A", A)
-    print("B", B)
-
-    solution = np.linalg.solve(A, B)
-
-    couts_pot = np.zeros((len(couts), len(couts[0])))
-
-    for i in range(len(couts)):
-        for j in range(len(couts[i])):
-            couts_pot[i][j] = solution[i] - solution[j + len(couts)]
-
-    print("\n=> Résolution du système linéaire :")
-    # Affichage de la résolution du système
-    for i in range(len(couts)):
-        print(f"E(S{i + 1}) =", int(solution[i]))
-    for i in range(len(proposition) - 1):
-        print(f"E(C{i + 1}) =", int(solution[len(couts) + i]))
-
-    print("\n=> Matrice des coûts potentiels :\n")
-    tab_couts_pot = pd.DataFrame(couts_pot.astype(int), index=[f"S{i + 1}" for i in range(len(couts))],
-                                 columns=[f"C{i + 1}" for i in range(len(couts[0]))])
-    print(tab_couts_pot)
-    return couts_pot
-
-
-def couts_marginaux(couts, couts_potentiels):
-    "return [couts[i][j] - couts_potentiels[i][j] for i in range(len(couts)) for j in range(len(couts[i]))]"
-    couts_marg = []
-    for i in range(len(couts)):
-        row = []
-        for j in range(len(couts[i])):
-            cout_marginal = int(couts[i][j] - couts_potentiels[i][j])
-            row.append(cout_marginal)
-        couts_marg.append(row)
-    print("\n=> Matrice des coûts marginaux :\n")
-    tab_couts_marg=pd.DataFrame(couts_marg, index=[f"S{i+1}" for i in range(len(couts))], columns=[f"C{i+1}" for i in range(len(couts[0]))])
-    print(tab_couts_marg)
-    return couts_marg
-
-
-def verif_cout_marginal_positif(couts_marginaux):
-    for i in range(len(couts_marginaux)):
-        for j in range(len(couts_marginaux[i])):
-            if couts_marginaux[i][j] < 0:
-                return False
-    return True
-
 
 def methode_du_marche_pied(proposition_quantity, proposition_couts):
     cout_marginal_negatif = True
-    #while cout_marginal_negatif:
+    iteration=0
+
     # Création du graphe à partir du tableau
     print("Création du graphe et des sommets :")
     tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
     print("\n")
 
+    """if iteration > 0 :
+        tab_sommet_id[ligne].link_id.append(tab_sommet_id[ligne + len(tab_s) + 1].id_sommet)
+        tab_sommet_id[ligne].link.append(tab_sommet_id[ligne + len(tab_s) + 1].nom_sommet)
+
+        tab_sommet_id[ligne + len(tab_s) + 1].link_id.append(tab_sommet_id[ligne].id_sommet)
+        tab_sommet_id[ligne + len(tab_s) + 1].link.append(tab_sommet_id[ligne].nom_sommet)"""
     # Vérification si cyclique
     # Premier appel à acyclique
     acyclique_result, le_cycle = acyclique(proposition_quantity, tab_sommet_id)
@@ -487,10 +407,18 @@ def methode_du_marche_pied(proposition_quantity, proposition_couts):
         # On supprime alors une arête
         print("Suppression des arêtes :")
         proposition_quantity, tableau_arete_nulles = supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c)
+
         print("Voici les arrêtes supprimées :", tableau_arete_nulles)
 
         print("Voici notre nouvelle proposition :", proposition_quantity)
         tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
+
+        """if iteration > 0 :
+            tab_sommet_id[ligne].link_id.append(tab_sommet_id[ligne + len(tab_s) + 1].id_sommet)
+            tab_sommet_id[ligne].link.append(tab_sommet_id[ligne + len(tab_s) + 1].nom_sommet)
+
+            tab_sommet_id[ligne + len(tab_s) + 1].link_id.append(tab_sommet_id[ligne].id_sommet)
+            tab_sommet_id[ligne + len(tab_s) + 1].link.append(tab_sommet_id[ligne].nom_sommet)"""
         # On vérifie de nouveau s'il est cyclique
         the_acyclique_result, the_le_cycle = acyclique(proposition_quantity, tab_sommet_id)
 
@@ -527,23 +455,31 @@ def methode_du_marche_pied(proposition_quantity, proposition_couts):
     print(pourquoi)
     print("\n")
 
-    # Calcul des coûts potentiels
-    cout_pot = couts_potentiels(proposition_couts, proposition_quantity)
-    # Calcul des coûts marginaux
-    couts_marge = couts_marginaux(proposition_couts, cout_pot)
-    # Tant qu'on a des couts marginaux négatifs
-    cout_marginal_negatif = not verif_cout_marginal_positif(couts_marge)
-    if cout_marginal_negatif:
-        # On rend la proposition optimisée (on cherche où ajouter un arrête et on l'ajoute dans tab_sommet_id
-        ligne, colonne, tab_sommet_id = rendre_optimise(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau, couts_marge)
-        # On répartit les quantités grâce à tab_sommet_id
-        proposition_quantity, arrete_supr = répartition_couts(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, ligne, colonne)
-        # arrete_surpimee = supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, arrete_a_supr)
-        # print("Pour optimiser, on a supprimé cette arête :", arrete_surpimee)
-        print("Nouvelle proposition :", proposition_quantity)
 
+    boucle_optimisation(proposition_couts,proposition_quantity,tab_s, tab_c, sous_tableau)
+    
     return proposition_quantity
 
+
+def boucle_optimisation(proposition_couts,proposition_quantity, tab_s, tab_c, sous_tableau):
+    cout_pot = couts_potentiels(proposition_couts, proposition_quantity)
+    couts_marge = couts_marginaux(proposition_couts, cout_pot)
+    while not(verif_cout_marginal_positif(couts_marge)) :
+        # Calcul des coûts potentiels
+        cout_pot = couts_potentiels(proposition_couts, proposition_quantity)
+        # Calcul des coûts marginaux
+        couts_marge = couts_marginaux(proposition_couts, cout_pot)
+        # Tant qu'on a des couts marginaux négatifs
+        cout_marginal_negatif = not verif_cout_marginal_positif(couts_marge)
+        if cout_marginal_negatif:
+          # On rend la proposition optimisée (on cherche où ajouter un arrête et on l'ajoute dans tab_sommet_id
+          ligne, colonne, tab_sommet_id = rendre_optimise(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau, couts_marge)
+          # On répartit les quantités grâce à tab_sommet_id
+          proposition_quantity, arrete_supr = répartition_couts(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, ligne, colonne)
+          # arrete_surpimee = supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, arrete_a_supr)
+          # print("Pour optimiser, on a supprimé cette arête :", arrete_surpimee)
+          print("Nouvelle proposition :", proposition_quantity)
+    return
 
 def rendre_optimise(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau, couts_marge):
     # On cherche quelle arête ajouter
@@ -639,6 +575,7 @@ def répartition_couts(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab
                 tableau_de_tableau_arete_nulles.append(tableau_arete_nulles)
 
     return proposition_quantity, tableau_de_tableau_arete_nulles
+
 
 
 
