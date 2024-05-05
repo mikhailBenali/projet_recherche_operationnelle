@@ -545,86 +545,73 @@ def rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_table
 
 
 def methode_du_marche_pied(proposition_quantity, proposition_couts):
-    cout_marginal_negatif = True
-    iteration = 0
-
     # Création du graphe à partir du tableau
     print("Création du graphe et des sommets :")
     tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
     print("\n")
-
-    """if iteration > 0 :
-        tab_sommet_id[ligne].link_id.append(tab_sommet_id[ligne + len(tab_s) + 1].id_sommet)
-        tab_sommet_id[ligne].link.append(tab_sommet_id[ligne + len(tab_s) + 1].nom_sommet)
-
-        tab_sommet_id[ligne + len(tab_s) + 1].link_id.append(tab_sommet_id[ligne].id_sommet)
-        tab_sommet_id[ligne + len(tab_s) + 1].link.append(tab_sommet_id[ligne].nom_sommet)"""
-    # Vérification si cyclique
-    # Premier appel à acyclique:
-    le_cycle = acyclique(tab_sommet_id)
-    if not le_cycle:
-        print("Il n'est pas cyclique.")
-    else:
-        print("Il est cyclique")
-        # S'il n'est pas cyclique
-        # Affichage du cycle
-        print("Voici son cycle :")
-        print(le_cycle)
-        for sommet in le_cycle:
-            print(sommet.nom_sommet, " ", end='')
-        print("\n")
-
-        # On supprime alors une arête
-        print("Suppression des arêtes :")
-        proposition_quantity, tableau_arete_nulles = supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s,
-                                                                 tab_c)
-
-        print("Voici les arrêtes supprimées :", tableau_arete_nulles)
-
-        print("Voici notre nouvelle proposition dans if dégénéré:", proposition_quantity)
-        tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
-
-        """if iteration > 0 :
-            tab_sommet_id[ligne].link_id.append(tab_sommet_id[ligne + len(tab_s) + 1].id_sommet)
-            tab_sommet_id[ligne].link.append(tab_sommet_id[ligne + len(tab_s) + 1].nom_sommet)
-
-            tab_sommet_id[ligne + len(tab_s) + 1].link_id.append(tab_sommet_id[ligne].id_sommet)
-            tab_sommet_id[ligne + len(tab_s) + 1].link.append(tab_sommet_id[ligne].nom_sommet)"""
-        # On vérifie de nouveau s'il est cyclique
-        the_acyclique_result, the_le_cycle = acyclique(proposition_quantity, tab_sommet_id)
-
-        print("Il est cyclique :", not the_acyclique_result)
-    print("\n")
-
-    # Vérification si connexe
-    est_connexe, sous_tableau = connexe(proposition_quantity, tab_sommet_id)
-    print("Il est connexe :", est_connexe)
-    # Affichage des liens
-    if est_connexe == False:
-        # Affichage des graphes
-        print("Voici les sous graphes.")
-        print("\n")
-        for i in range(len(sous_tableau)):
-            for j in range(len(sous_tableau[i])):
-                print(sous_tableau[i][j].nom_sommet, end=' ')
+    degenere = True
+    while degenere:
+        # Vérification si cyclique
+        # Premier appel à acyclique:
+        le_cycle = acyclique(tab_sommet_id)
+        # Si pas cyclique
+        if not le_cycle:
+            print("Il n'est pas cyclique.")
+        # Si elle est cyclique
+        else:
+            print("Il est cyclique")
+            # S'il n'est pas cyclique
+            # Affichage du cycle
+            print("Voici son cycle :")
+            print(le_cycle)
+            for sommet in le_cycle:
+                print(sommet.nom_sommet, " ", end='')
             print("\n")
-        print("On le rend connexe.")
 
-        # Rendre connexe
-        tab_sommet_id = rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau)
+            # On supprime alors une arête
+            print("Suppression des arêtes :")
+            proposition_quantity, tableau_arete_nulles = répartition_couts(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c)
+            print("Voici les arrêtes supprimées :", tableau_arete_nulles)
+            print("Voici notre nouvelle proposition  après avoir supprimé une arrête.", proposition_quantity)
+            tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
 
-        # Affichage du nouveau graphe
-        print("Voici les nouveaux liens")
-        for p in range(len(tab_s)):
-            print(tab_sommet_id[p].nom_sommet)
-            print(tab_sommet_id[p].link)
-    print("\n")
+            # On vérifie de nouveau s'il est cyclique
+            the_acyclique_result, the_le_cycle = acyclique(proposition_quantity, tab_sommet_id)
 
-    # Vérification si dégénérée
-    degenere, pourquoi = verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id)
-    print("Il est dégénéré :", degenere)
-    print(pourquoi)
-    print("\n")
+            print("Il est cyclique :", not the_acyclique_result)
+
+        print("\n")
+
+        # Vérification si connexe
+        est_connexe, sous_tableau = connexe(proposition_quantity, tab_sommet_id)
+        print("Il est connexe :", est_connexe)
+        # Affichage des liens
+        if est_connexe == False:
+            # Affichage des graphes
+            print("Voici les sous graphes.")
+            print("\n")
+            for i in range(len(sous_tableau)):
+                for j in range(len(sous_tableau[i])):
+                    print(sous_tableau[i][j].nom_sommet, end=' ')
+                print("\n")
+            print("On va le rendre connexe.")
+
+            # Rendre connexe
+            tab_sommet_id = rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau)
+
+            # Affichage du nouveau graphe
+            print("Voici les nouveaux liens")
+            for p in range(len(tab_s)):
+                print(tab_sommet_id[p].nom_sommet)
+                print(tab_sommet_id[p].link)
+
+        print("\n")
+
+        # Vérification si dégénérée
+        degenere, pourquoi = verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id)
+        print("Il est dégénéré :", degenere)
+        print(pourquoi)
+        print("\n")
 
     boucle_optimisation(proposition_couts, proposition_quantity, tab_s, tab_c, sous_tableau, tab_sommet_id)
 
@@ -655,7 +642,7 @@ def boucle_optimisation(proposition_couts, proposition_quantity, tab_s, tab_c, s
 
         # On répartit les quantités grâce à tab_sommet_id
         proposition_quantity, arrete_supr = répartition_couts(proposition_quantity, tab_sommet_id, mon_cycle, tab_s,
-                                                              tab_c, ligne, colonne)
+                                                              tab_c)
         # arrete_surpimee = supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, arrete_a_supr)
         print("Pour optimiser, on a supprimé cette arête :", arrete_supr)
         print("Nouvelle proposition :", proposition_quantity)

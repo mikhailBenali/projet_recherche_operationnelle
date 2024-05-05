@@ -189,8 +189,10 @@ def calcul_cout_total(matrice_cout,proposition_transport,dimensions):
     print(f"\nLe coût total de la proposition est : {cout_total} €.")
     return cout_total
 
+
 def capacite_case(x,y,proposition):
     return min(proposition[x][-1],proposition[-1][y])
+
 
 def couts_potentiels(couts,proposition):
     decoration_affichage("====== Calcul des potentiels ======")
@@ -253,6 +255,7 @@ def couts_potentiels(couts,proposition):
     tab_couts_pot=pd.DataFrame(couts_pot.astype(int), index=[f"S{i+1}" for i in range(len(couts))], columns=[f"C{i+1}" for i in range(len(couts[0]))])
     print(tab_couts_pot)
     return couts_pot
+
 
 def couts_marginaux(couts,couts_potentiels):
     "return [couts[i][j] - couts_potentiels[i][j] for i in range(len(couts)) for j in range(len(couts[i]))]"
