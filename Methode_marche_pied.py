@@ -454,6 +454,8 @@ def methode_du_marche_pied(proposition_quantity, proposition_couts):
 
 
 def boucle_optimisation(proposition_couts,proposition_quantity, tab_s, tab_c, sous_tableau):
+    cout_pot = couts_potentiels(proposition_couts, proposition_quantity)
+    couts_marge = couts_marginaux(proposition_couts, cout_pot)
     while not(verif_cout_marginal_positif(couts_marge)) :
         # Calcul des coûts potentiels
         cout_pot = couts_potentiels(proposition_couts, proposition_quantity)
