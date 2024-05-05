@@ -487,14 +487,27 @@ def supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c):
         else:
             le_cycle_values[i] -= plus_petit
 
+        # On remet le tableau le_cycle_value dans l'ordre d'origine
+        # Trouver l'index de l'arête nulle dans le tableau réorganisé
+        index_arrete = le_cycle_values.index(0)
+
+        # Séparer le tableau en deux parties
+        partie1 = le_cycle_values[index_arrete:]
+        partie2 = le_cycle_values[:index_arrete]
+
+        # Reconstruire le tableau d'origine dans l'ordre requis
+        le_cycle_values = partie1[1:] + [0] + partie2
+
+        print("Tableau original après réorganisation inverse :", le_cycle_values)
+
+    print("les vals à mettres dans le tableau", le_cycle_values)
     # Maintenant, on met les valeurs calculées dans la proposition de base
     for i in range(len(le_cycle) - 1):
         tableau_arete_nulles = []
         # On veut récupérer les valeurs des sommets cycle dans la liste des sommets générale
         if le_cycle[i].nom_sommet.startswith("S"):
             # On l'ajoute à proposition quantity
-            proposition_quantity[le_cycle[i].id_sommet][le_cycle[i + 1].id_sommet - len(tab_s)] = le_cycle_values[
-                i]
+            proposition_quantity[le_cycle[i].id_sommet][le_cycle[i + 1].id_sommet + len(tab_s)] = le_cycle_values[i]
             if le_cycle_values[i] == 0:
                 # Pour le print de l'arete surpimée
                 tableau_arete_nulles.append(le_cycle[i].nom_sommet)
@@ -502,8 +515,7 @@ def supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c):
                 tableau_de_tableau_arete_nulles.append(tableau_arete_nulles)
 
         else:
-            proposition_quantity[le_cycle[i + 1].id_sommet][le_cycle[i].id_sommet - len(tab_s)] = le_cycle_values[
-                i]
+            proposition_quantity[le_cycle[i + 1].id_sommet + len(tab_s)][le_cycle[i].id_sommet] = le_cycle_values[i]
             if le_cycle_values[i] == 0:
                 # Pour le print de l'arete surpimée
                 tableau_arete_nulles.append(le_cycle[i].nom_sommet)
@@ -681,17 +693,9 @@ def rendre_optimise(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tabl
     return ligne, colonne, tab_sommet_id
 
 
-def répartition_couts(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, ligne, colonne):
-    print("Début répartition couts :")
-    # Conversion de l'arête en sommet
-    # Le S
-    sommet_arete_0 = tab_sommet_id[ligne]
-    # Le C
-    sommet_arete_1 = tab_sommet_id[colonne + len(tab_s)]
-
+def répartition_couts(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c):
     le_cycle_values = []
     tableau_de_tableau_arete_nulles = []
-    print("Le cycle :")
     for objet in le_cycle:
         print(objet.nom_sommet)
     # On retrouve les valeurs des arêtes qui forment le cycle et on les ajoute à le_cycle_values
@@ -704,59 +708,27 @@ def répartition_couts(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab
             le_cycle_values.append(
                 proposition_quantity[le_cycle[i + 1].id_sommet][le_cycle[i].id_sommet - len(tab_s)])
 
-    print("Mon tableau avec zéro", le_cycle_values)
-
-    # On commence par se placer sur l'arete nulle
-    index_arrete = le_cycle_values.index(0)
-
-    # Séparer le tableau en deux parties
-    partie1 = le_cycle_values[index_arrete:]
-    partie2 = le_cycle_values[:index_arrete]
-
-    # Concaténer les deux parties dans l'ordre requis
-    le_cycle_values = partie1 + partie2
-
-    print("tableau aretes après réorganisation", le_cycle_values)
-
     # On cherche la valeur de l'arête la plus petite sans compter 0
     tab_sans_zero = [valeur for valeur in le_cycle_values if valeur != 0]
-    print("Mon tableau sans zéro", tab_sans_zero)
     for i in range(len(tab_sans_zero)):
         print("Condition", i, ":", tab_sans_zero[i])
     tab_sans_zero = [tab_sans_zero[0], tab_sans_zero[-1]]
-    print("Mon tableau sans zéro avec avant et après dans le cycle", tab_sans_zero)
-
     plus_petit = min(tab_sans_zero)
 
-    print("tableau aretes avant", le_cycle_values)
-    print("La valeure qu'on ajoute ou soustrait est :", plus_petit)
-
     # On a la valeur à soustraire, maintenant, on veut effectivement la soustraire et l'additionner
-    for i in range(len(le_cycle_values)):
-        if i % 2 == 0:
-            print("Opération paire")
-            print("Opération avant", le_cycle_values[i])
+    index_arrete = le_cycle_values.index(0)
+
+    for i in range(index_arrete, len(le_cycle_values) + index_arrete):
+        i = i % len(le_cycle_values)
+        # check si pair
+        p = index_arrete % 2
+        if i % 2 == p:
             le_cycle_values[i] += plus_petit
-            print("Opération après", le_cycle_values[i])
         else:
-            print("Opération impaire")
-            print("Opération avant", le_cycle_values[i])
             le_cycle_values[i] -= plus_petit
-            print("Opération après", le_cycle_values[i])
 
     # On remet le tableau le_cycle_value dans l'ordre d'origine
     # Trouver l'index de l'arête nulle dans le tableau réorganisé
-    index_arrete = le_cycle_values.index(0)
-
-    # Séparer le tableau en deux parties
-    partie1 = le_cycle_values[index_arrete:]
-    partie2 = le_cycle_values[:index_arrete]
-
-    # Reconstruire le tableau d'origine dans l'ordre requis
-    le_cycle_values = partie1[1:] + [0] + partie2
-
-    print("Tableau original après réorganisation inverse :", le_cycle_values)
-
 
     # Maintenant, on remet les valeurs calculées dans la proposition de base
     for i in range(len(le_cycle_values)):
@@ -780,61 +752,3 @@ def répartition_couts(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab
                 tableau_de_tableau_arete_nulles.append(tableau_arete_nulles)
 
     return proposition_quantity, tableau_de_tableau_arete_nulles
-
-
-"""
-def new_supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, arete_nulle):
-    # On prend l'arete nulle. On veut que le cycle[0] soit arete nulle et que le tableau soit rangé en fonction
-   if arete_nulle != None:
-       index_arete_nulle_0 = le_cycle.index(arete_nulle[0])
-       index_arete_nulle_1 = le_cycle.index(arete_nulle[1])
-       point_central = le_cycle[index_arete_nulle]
-
-    tableau_arete_nulles = []
-    le_cycle_values = []
-    tableau_de_tableau_arete_nulles = []
-    # On retrouve les valeurs des arêtes qui forment le cycle
-    for i in range(len(le_cycle) - 1):
-        # On veut récupérer les valeurs des sommets cycle dans la liste des sommets générale
-        if le_cycle[i].nom_sommet.startswith("S"):
-            le_cycle_values.append(
-                proposition_quantity[le_cycle[i].id_sommet][le_cycle[i + 1].id_sommet - len(tab_s)])
-        else:
-            le_cycle_values.append(
-                proposition_quantity[le_cycle[i + 1].id_sommet][le_cycle[i].id_sommet - len(tab_s)])
-
-    # On cherche la valeur de l'arrete la plus petite sans compter 0
-    tab_sans_zero = [valeur for valeur in le_cycle_values if valeur != 0]
-    for i in range(len(tab_sans_zero)):
-        print("Condition", i,":" , tab_sans_zero[i])
-    tab_sans_zero = [tab_sans_zero[0], tab_sans_zero[-1]]
-    plus_petit = min(tab_sans_zero)
-
-    # On a la valeur à soustraire, maintenant, on veut effectivement la soustraire et l'additionner
-    nombre_iterations = len(le_cycle_values)
-    for i in range(nombre_iterations):
-        if i % 2 == 0:
-            le_cycle_values[i] += plus_petit
-
-        else:
-            le_cycle_values[i] -= plus_petit
-
-    # Maintenant, on met les valeurs calculées dans la proposition de base
-    for i in range(len(le_cycle) - 1):
-        tableau_arete_nulles = []
-        # On veut récupérer les valeurs des sommets cycle dans la liste des sommets générale
-        if le_cycle[i].nom_sommet.startswith("S"):
-            proposition_quantity[le_cycle[i].id_sommet][le_cycle[i + 1].id_sommet - len(tab_s)] = le_cycle_values[i]
-            if le_cycle_values[i] == 0:
-                tableau_arete_nulles.append(le_cycle[i].nom_sommet)
-                tableau_arete_nulles.append(le_cycle[i + 1].nom_sommet)
-                tableau_de_tableau_arete_nulles.append(tableau_arete_nulles)
-
-        else:
-            proposition_quantity[le_cycle[i + 1].id_sommet][le_cycle[i].id_sommet - len(tab_s)] = le_cycle_values[i]
-            if le_cycle_values[i] == 0:
-                tableau_arete_nulles.append(le_cycle[i].nom_sommet)
-                tableau_arete_nulles.append(le_cycle[i + 1].nom_sommet)
-                tableau_de_tableau_arete_nulles.append(tableau_arete_nulles)
-
-    return"""

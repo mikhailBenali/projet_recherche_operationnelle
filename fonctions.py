@@ -246,7 +246,7 @@ def couts_potentiels(couts,proposition):
     # Affichage de la résolution du système
     for i in range(len(couts)):
         print(f"E(S{i+1}) =", int(solution[i]))
-    for i in range(len(proposition)-1):
+    for i in range(len(proposition)):
         print(f"E(C{i+1}) =", int(solution[len(couts)+i]))
     
     print("\n=> Matrice des coûts potentiels :\n")
