@@ -464,7 +464,6 @@ def boucle_optimisation(proposition_couts,proposition_quantity, tab_s, tab_c, so
         if cout_marginal_negatif:
             # On rend la proposition optimisée
             tab_sommet_id, ligne, colonne = rendre_optimise(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau, couts_marge)
-    iteration +=1
     return
 
 def rendre_optimise(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau, couts_marge):
