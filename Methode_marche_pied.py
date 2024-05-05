@@ -72,7 +72,6 @@ def detecter_cycle(sommet, visited, parent, cycle, tab_sommet_id):
     visited[sommet.id_sommet] = True
     cycle.append(sommet)
 
-
     # Parcourir tous les voisins du sommet
     for voisin_id in sommet.link_id:
         if not visited[voisin_id]:
@@ -80,24 +79,26 @@ def detecter_cycle(sommet, visited, parent, cycle, tab_sommet_id):
                 return True
         # Si le voisin est déjà visité et n'est pas le parent du sommet actuel, alors il y a un cycle
         elif parent != voisin_id:
+            cycle.append(tab_sommet_id[voisin_id])
+            #for voisin in sommet.link_id:
+            #cycle.pop(voisin)
             return True
 
     cycle.pop()
     return False
 
 
-
 # Fonction principale pour vérifier s'il y a des cycles dans le graphe
 def acyclique(tab_sommet_id):
     visited = {sommet.id_sommet: False for sommet in tab_sommet_id}
-    cycle = []
 
     # Parcourir tous les sommets du graphe
     for sommet in tab_sommet_id:
         if not visited[sommet.id_sommet]:
+            cycle = []
             if detecter_cycle(sommet, visited, -1, cycle, tab_sommet_id):
                 cycle.pop(0)
-                cycle.append(cycle[0])  # Ajouter le premier sommet du cycle à la fin
+                # cycle.append(cycle[0])  # Ajouter le premier sommet du cycle à la fin
                 return cycle
 
     return None
@@ -563,13 +564,12 @@ def methode_du_marche_pied(proposition_quantity, proposition_couts):
             # S'il n'est pas cyclique
             # Affichage du cycle
             print("Voici son cycle :")
-            print(le_cycle)
             for sommet in le_cycle:
                 print(sommet.nom_sommet, " ", end='')
             print("\n")
 
             # On supprime alors une arête
-            print("Suppression des arêtes :")
+            # print("Suppression des arêtes :")
             proposition_quantity, tableau_arete_nulles = répartition_couts(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c)
             print("Voici les arrêtes supprimées :", tableau_arete_nulles)
             print("Voici notre nouvelle proposition  après avoir supprimé une arrête.", proposition_quantity)
@@ -683,8 +683,6 @@ def rendre_optimise(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tabl
 def répartition_couts(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c):
     le_cycle_values = []
     tableau_de_tableau_arete_nulles = []
-    for objet in le_cycle:
-        print(objet.nom_sommet)
     # On retrouve les valeurs des arêtes qui forment le cycle et on les ajoute à le_cycle_values
     for i in range(len(le_cycle) - 1):
         # On veut récupérer les valeurs des sommets cycle dans la liste des sommets générale
