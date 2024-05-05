@@ -1,0 +1,6 @@
+La proposition de transport initalisee avec la methode Nord-Ouest est la suivante : 
+
+50 10 0 0 60
+0 30 0 0 30
+0 35 30 25 90
+50 75 30 25 180

@@ -1,0 +1,10 @@
+La proposition de transport initalisee avec la methode Nord-Ouest est la suivante : 
+
+100 0 0 100
+100 0 0 100
+100 0 0 100
+100 0 0 100
+0 100 0 100
+0 100 0 100
+0 0 100 100
+400 200 100 700
