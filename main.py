@@ -102,13 +102,8 @@ while True:
                         print("Rq : Les valeurs du tableau correspondent aux QUANTITÉS \n")
                         afficher_proposition_transport(matrice_NO)
                         proposition_quantity = reduction(matrice_NO)
-                        couts_pot = couts_potentiels(couts_unitaires,proposition_quantity)
-                        couts_marg = couts_marginaux(couts_unitaires,couts_pot)
-                        while not(verif_cout_marginal_positif(couts_marg)):
-                            proposition_quantity=methode_du_marche_pied(proposition_quantity,couts_unitaires,couts_marg)
-                            couts_pot = couts_potentiels(couts_unitaires,proposition_quantity)
-                            couts_marg = couts_marginaux(couts_unitaires,couts_pot)
-                            
+
+                        proposition_quantity=methode_du_marche_pied(proposition_quantity,couts_unitaires)                            
 
                 elif algo_choisi == "2":
                     num_proposition = int(input("Entrer le n° de proposition de problème de transport à initialiser (entre 1 et 12) : "))

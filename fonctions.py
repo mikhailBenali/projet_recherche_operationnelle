@@ -196,6 +196,7 @@ def couts_potentiels(couts,proposition):
     # Affichage du système linéaire
     for i in range(len(proposition)):
         for j in range(len(proposition[i])):
+            
             if proposition[i][j] != 0:
                 print(f"E(S{i+1}) - E(C{j+1}) = {couts[i][j]}")
 
