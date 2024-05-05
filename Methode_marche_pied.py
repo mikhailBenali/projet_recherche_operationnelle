@@ -680,7 +680,7 @@ def rendre_optimise(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tabl
 
     return ligne, colonne, tab_sommet_id
 
-[[25, 0, 0], [0, 5, 20], [10, 15, 0]]
+
 def répartition_couts(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, ligne, colonne):
     print("Début répartition couts :")
     # Conversion de l'arête en sommet
