@@ -46,6 +46,8 @@ def afficher_proposition_transport(matrice):
     matrice = matrice.rename(index={commandes: 'Commandes'})
 
     print(matrice)
+    
+    return matrice
 
 def algo_nord_ouest(proposition_transport,dimensions):
     lignes, colonnes = dimensions # Correspond aux dimensions n,m dans la première ligne du fichier de proposition de transport

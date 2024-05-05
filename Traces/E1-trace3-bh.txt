@@ -1,0 +1,5 @@
+La proposition de transport initalisée avec la méthode Nord-Ouest est la suivante : 
+
+0 600 600
+100 400 500
+100 1000 1100

@@ -1,23 +1,21 @@
 from fonctions import *
 from Methode_marche_pied import *
 
-proposition_couts = [[5, 6], [1, 9]]
+"""proposition_couts = [[5, 6], [1, 9]]
 proposition_quantity = [[50, 20], [10, 20]]
-"""print("PRE")
+print("PRE")
 tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
 
 est_acycl, le_cycle = acyclique(proposition_quantity, tab_sommet_id)
 arete_nulle = ["S1", "C1"]
 new_supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, arete_nulle)
-print("FIN")"""
+print("FIN")
 
 
 proposition_quantity = methode_du_marche_pied(proposition_quantity, proposition_couts)
 
 
-print("FIN DU PREMIER")
-
-
+print("FIN DU PREMIER")"""
 
 # Création d'une arête nulle
 """for i in range(len(tab_s)):
@@ -65,12 +63,26 @@ while True:
                     print("Rq : Les valeurs du tableau correspondent aux QUANTITÉS \n")
                     afficher_proposition_transport(matrice_NO)
                     cout_total=calcul_cout_total(couts_unitaires,matrice_NO,dimensions)
+                    
+                    # Écriture dans le fichier trace
+                    with open(f"Traces/E1-trace{num_proposition}-no.txt", "w") as f:
+                        f.write(f"La proposition de transport initalisee avec la methode Nord-Ouest est la suivante : \n\n")
+                        for ligne in matrice_NO:
+                            f.write(" ".join(map(str, ligne)) + "\n")
+                    
                 elif algo_choisi == "2":
                     decoration_affichage("====== ALGORITHME BALAS-HAMMER ======\n")
                     matrice_BH=algo_balas_hammer(couts_unitaires,proposition_transport)
                     print("Rq : Les valeurs du tableau correspondent aux QUANTITÉS \n")
                     afficher_proposition_transport(matrice_BH)
                     cout_total=calcul_cout_total(couts_unitaires,matrice_BH,dimensions)
+                    
+                    # Écriture dans le fichier trace
+                    with open(f"Traces/E1-trace{num_proposition}-bh.txt", "w") as f:
+                        f.write(f"La proposition de transport initalisée avec la méthode Nord-Ouest est la suivante : \n\n")
+                        for ligne in matrice_BH:
+                            f.write(" ".join(map(str, ligne)) + "\n")
+                    
                 elif algo_choisi == "3":
                     print("Vous avez choisi de revenir au menu principal")
                     break
