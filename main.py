@@ -1,11 +1,23 @@
 from fonctions import *
 from Methode_marche_pied import *
 
-proposition_couts = [[5, 6, 7], [1, 9, 7]]
-proposition_quantity = [[60, 20, 0], [10, 10, 0]]
+proposition_couts = [[5, 6], [1, 9]]
+proposition_quantity = [[50, 20], [10, 20]]
+"""print("PRE")
+tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
+
+est_acycl, le_cycle = acyclique(proposition_quantity, tab_sommet_id)
+arete_nulle = ["S1", "C1"]
+new_supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, arete_nulle)
+print("FIN")"""
 
 
-proposition_quantity = methode_du_marche_pied(proposition_quantity)
+proposition_quantity = methode_du_marche_pied(proposition_quantity, proposition_couts)
+
+
+print("FIN DU PREMIER")
+
+
 
 # Création d'une arête nulle
 """for i in range(len(tab_s)):
@@ -39,7 +51,7 @@ while True:
             print("Rq : Les valeurs du tableau correspondent aux COÛTS \n")
             afficher_proposition_transport(proposition_transport)
             couts_unitaires=matrice_couts(proposition_transport)
-            
+
             while True:
                 decoration_affichage("Choisissez l'algorithme :")
                 print("1. Nord-Ouest")
@@ -89,11 +101,14 @@ while True:
                         matrice_NO=algo_nord_ouest(proposition_transport,dimensions)
                         print("Rq : Les valeurs du tableau correspondent aux QUANTITÉS \n")
                         afficher_proposition_transport(matrice_NO)
-                        couts_pot = couts_potentiels(couts_unitaires,matrice_NO)
-                        couts_marg = couts_marginaux(couts_unitaires,couts_pot)
+
+                        proposition_quantity = reduction(matrice_NO)
+
+                        proposition_quantity=methode_du_marche_pied(proposition_quantity,couts_unitaires)                            
+
                 elif algo_choisi == "2":
                     num_proposition = int(input("Entrer le n° de proposition de problème de transport à initialiser (entre 1 et 12) : "))
-                    if 1 <= num_proposition <= 13:
+                    if 1 <= num_proposition <= 12:
                         file_name= f'Propositions/proposition {num_proposition}.txt'
                         decoration_affichage(f'Problème de transport N°{num_proposition}: \n')
                         print("Rq : Les valeurs du tableau correspondent aux COÛTS \n")
@@ -106,6 +121,10 @@ while True:
                         afficher_proposition_transport(matrice_BH)
                         couts_pot = couts_potentiels(couts_unitaires,matrice_BH)
                         couts_marg = couts_marginaux(couts_unitaires,couts_pot)
+                        while not(verif_cout_marginal_positif(couts_marg)):
+                            matrice_BH=methode_du_marche_pied(matrice_BH,couts_unitaires)
+                            couts_pot = couts_potentiels(couts_unitaires,matrice_BH)
+                            couts_marg = couts_marginaux(couts_unitaires,couts_pot)
                 elif algo_choisi == "3":
                     print("Vous avez choisi de revenir au menu principal")
                     break
@@ -116,5 +135,4 @@ while True:
         print("Au revoir !")
         break
     else:
-
         print("Choix invalide. Veuillez entrer 1 ou 2.")

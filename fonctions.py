@@ -168,6 +168,7 @@ def algo_balas_hammer(couts, proposition):
     copie_proposition[-1,:] = commandes_initiales
     copie_proposition[-1,-1] = total
     
+    copie_proposition=copie_proposition.tolist()
     return copie_proposition
 
 def calcul_cout_total(matrice_cout,proposition_transport,dimensions):
@@ -193,8 +194,9 @@ def couts_potentiels(couts,proposition):
     decoration_affichage("====== Calcul des potentiels ======")
     print("\n=> Système linéaire pour le calcul des potentiels :")
     # Affichage du système linéaire
-    for i in range(len(proposition)-1):
-        for j in range(len(proposition[i])-1):
+    for i in range(len(proposition)):
+        for j in range(len(proposition[i])):
+            
             if proposition[i][j] != 0:
                 print(f"E(S{i+1}) - E(C{j+1}) = {couts[i][j]}")
 
@@ -203,26 +205,30 @@ def couts_potentiels(couts,proposition):
     
     arretes = []
     
-    for i in range(len(proposition)-1):
-        for j in range(len(proposition[i])-1):
+    for i in range(len(proposition)):
+        for j in range(len(proposition[i])):
             if proposition[i][j] != 0:
                 arretes.append((i,j,couts[i][j]))
     
     # On initialise les listes A (coefficients des variables) et B (résultats des équations)
     A = np.zeros((len(couts)+len(couts[0]),len(couts)+len(couts[0])))
     B = []
-    
+    print("prop=",proposition)
+    print("arretes=", arretes)
     for i in range(len(arretes)):
         x,y,d = arretes[i]
         A[i][x] = 1
         A[i][y+len(couts)] = -1
         B.append(d)
     
+    
     # On définit le coût potentiel de la première case à 0
     A[-1][0] = 1 
     B.append(0)
     print("E(S1) = 0")
     
+    print("A=",A)
+    print("B=",B)
     solution = np.linalg.solve(A,B)
     
     couts_pot = np.zeros((len(couts),len(couts[0])))
@@ -256,3 +262,10 @@ def couts_marginaux(couts,couts_potentiels):
     tab_couts_marg=pd.DataFrame(couts_marg, index=[f"S{i+1}" for i in range(len(couts))], columns=[f"C{i+1}" for i in range(len(couts[0]))])
     print(tab_couts_marg)
     return couts_marg
+
+def verif_cout_marginal_positif(couts_marginaux):
+    for i in range(len(couts_marginaux)):
+        for j in range(len(couts_marginaux[i])):
+            if couts_marginaux[i][j] < 0:
+                return False
+    return True
