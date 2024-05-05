@@ -1,12 +1,24 @@
 from fonctions import *
 from Methode_marche_pied import *
 
-"""proposition_couts = [[5, 6, 7], [1, 9, 7]]
-proposition_quantity = [[60, 20, 0], [10, 10, 0]]
+proposition_couts = [[5, 6], [1, 9]]
+proposition_quantity = [[50, 20], [10, 20]]
+"""print("PRE")
+tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
+
+est_acycl, le_cycle = acyclique(proposition_quantity, tab_sommet_id)
+arete_nulle = ["S1", "C1"]
+new_supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, arete_nulle)
+print("FIN")"""
 
 
-proposition_quantity = methode_du_marche_pied(proposition_quantity)
-"""
+proposition_quantity = methode_du_marche_pied(proposition_quantity, proposition_couts)
+
+
+print("FIN DU PREMIER")
+
+
+
 # Création d'une arête nulle
 """for i in range(len(tab_s)):
     print("Link de :", tab_sommet_id[i].nom_sommet)
@@ -21,18 +33,6 @@ print("Création du fake sommet à 0 entre S2 et C1")
 tab_sommet_id[2].link_id.append(tab_sommet_id[1].id_sommet)
 tab_sommet_id[1].link_id.append(tab_sommet_id[2].id_sommet)"""
 
-
-
-
-
-
-
-
-
-couts_unitaires = None
-proposition_transport = None
-matrice_NO = None
-matrice_BH = None
 while True:
     decoration_affichage("MENU PRINCIPAL :")
     print("1. Initialiser une proposition de problème de transport")
@@ -103,8 +103,9 @@ while True:
                         afficher_proposition_transport(matrice_NO)
                         couts_pot = couts_potentiels(couts_unitaires,matrice_NO)
                         couts_marg = couts_marginaux(couts_unitaires,couts_pot)
+                        print(couts_marg)
                         while not(verif_cout_marginal_positif(couts_marg)):
-                            matrice_NO=methode_du_marche_pied(matrice_NO)
+                            matrice_NO=methode_du_marche_pied(matrice_NO, couts_unitaires)
                             couts_pot = couts_potentiels(couts_unitaires,matrice_NO)
                             couts_marg = couts_marginaux(couts_unitaires,couts_pot)
                             

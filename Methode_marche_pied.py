@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 
 
-def graph_creation(proposition_quantity):
+def reduction(proposition_quantity):
     print("proposition_quantity Avant :", proposition_quantity)
 
     proposition_quantity = proposition_quantity[:-1]
@@ -11,6 +11,11 @@ def graph_creation(proposition_quantity):
         proposition_quantity[i] = proposition_quantity[i][:-1]
 
     print("proposition_quantity Après :", proposition_quantity)
+
+    return proposition_quantity
+
+
+def graph_creation(proposition_quantity):
     # print("La matrice des quantités est :")
 
     # Création de "S" et "C"
@@ -300,6 +305,8 @@ def verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id):
 
 
 def supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c):
+   # if arrete_a_supr != None:
+
     tableau_arrete_sommet = []
     tableau_arete_nulles = []
     tableau_de_tableau_arete_nulles = []
@@ -324,18 +331,20 @@ def supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c):
     nombre_iterations = len(tableau_arrete_sommet)
     for i in range(nombre_iterations):
         if i % 2 == 0:
-            tableau_arrete_sommet[i] -= plus_petit
+            tableau_arrete_sommet[i] += plus_petit
 
         else:
-            tableau_arrete_sommet[i] += plus_petit
+            tableau_arrete_sommet[i] -= plus_petit
 
     # Maintenant, on met les valeurs calculées dans la proposition de base
     for i in range(len(le_cycle) - 1):
         tableau_arete_nulles = []
         # On veut récupérer les valeurs des sommets cycle dans la liste des sommets générale
         if le_cycle[i].nom_sommet.startswith("S"):
+            # On l'ajoute à proposition quantity
             proposition_quantity[le_cycle[i].id_sommet][le_cycle[i + 1].id_sommet - len(tab_s)] = tableau_arrete_sommet[i]
             if tableau_arrete_sommet[i] == 0:
+                # Pour le print de l'arete surpimée
                 tableau_arete_nulles.append(le_cycle[i].nom_sommet)
                 tableau_arete_nulles.append(le_cycle[i + 1].nom_sommet)
                 tableau_de_tableau_arete_nulles.append(tableau_arete_nulles)
@@ -343,11 +352,12 @@ def supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c):
         else:
             proposition_quantity[le_cycle[i + 1].id_sommet][le_cycle[i].id_sommet - len(tab_s)] = tableau_arrete_sommet[i]
             if tableau_arrete_sommet[i] == 0:
+                # Pour le print de l'arete surpimée
                 tableau_arete_nulles.append(le_cycle[i].nom_sommet)
                 tableau_arete_nulles.append(le_cycle[i + 1].nom_sommet)
                 tableau_de_tableau_arete_nulles.append(tableau_arete_nulles)
 
-    return tableau_de_tableau_arete_nulles
+    return proposition_quantity, tableau_de_tableau_arete_nulles
 
 
 def rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau):
@@ -430,7 +440,7 @@ def couts_potentiels(couts, proposition):
     return couts_pot
 
 
-def couts_marginaux(couts,couts_potentiels):
+def couts_marginaux(couts, couts_potentiels):
     "return [couts[i][j] - couts_potentiels[i][j] for i in range(len(couts)) for j in range(len(couts[i]))]"
     couts_marg = []
     for i in range(len(couts)):
@@ -455,77 +465,82 @@ def verif_cout_marginal_positif(couts_marginaux):
 
 def methode_du_marche_pied(proposition_quantity, proposition_couts):
     cout_marginal_negatif = True
-    while cout_marginal_negatif:
-        # Création du graphe à partir du tableau
-        print("Création du graphe et des sommets :")
+    #while cout_marginal_negatif:
+    # Création du graphe à partir du tableau
+    print("Création du graphe et des sommets :")
+    tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
+    print("\n")
+
+    # Vérification si cyclique
+    # Premier appel à acyclique
+    acyclique_result, le_cycle = acyclique(proposition_quantity, tab_sommet_id)
+    print("Il est cyclique :", not acyclique_result)
+
+    if not acyclique_result:
+        # S'il n'est pas cyclique
+        # Affichage du cycle
+        print("Voici son cycle :")
+        for sommet in le_cycle:
+            print(sommet.nom_sommet, " ", end='')
+        print("\n")
+
+        # On supprime alors une arête
+        print("Suppression des arêtes :")
+        proposition_quantity, tableau_arete_nulles = supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c)
+        print("Voici les arrêtes supprimées :", tableau_arete_nulles)
+
+        print("Voici notre nouvelle proposition :", proposition_quantity)
         tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
+        # On vérifie de nouveau s'il est cyclique
+        the_acyclique_result, the_le_cycle = acyclique(proposition_quantity, tab_sommet_id)
+
+        print("Il est cyclique :", not the_acyclique_result)
+    print("\n")
+
+    # Vérification si connexe
+    est_connexe, sous_tableau = connexe(proposition_quantity, tab_sommet_id)
+    print("Il est connexe :", est_connexe)
+    # Affichage des liens
+    if est_connexe == False:
+        # Affichage des graphes
+        print("Voici les sous graphes.")
         print("\n")
-
-        # Vérification si cyclique
-        # Premier appel à acyclique
-        acyclique_result, le_cycle = acyclique(proposition_quantity, tab_sommet_id)
-        print("Il est cyclique :", not acyclique_result)
-
-        if not acyclique_result:
-            # S'il n'est pas cyclique
-            # Affichage du cycle
-            print("Voici son cycle :")
-            for sommet in le_cycle:
-                print(sommet.nom_sommet, " ", end='')
+        for i in range(len(sous_tableau)):
+            for j in range(len(sous_tableau[i])):
+                print(sous_tableau[i][j].nom_sommet, end=' ')
             print("\n")
+        print("On le rend connexe.")
 
-            # On supprime alors une arête
-            print("Suppression des arêtes :")
-            tableau_arete_nulles = supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c)
-            print("Voici les arrêtes supprimées :", tableau_arete_nulles)
+        # Rendre connexe
+        tab_sommet_id = rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau)
 
-            print("Voici notre nouvelle proposition :", proposition_quantity)
-            tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
-            # On vérifie de nouveau s'il est cyclique
-            the_acyclique_result, the_le_cycle = acyclique(proposition_quantity, tab_sommet_id)
+        # Affichage du nouveau graphe
+        print("Voici les nouveaux liens")
+        for p in range(len(tab_s)):
+            print(tab_sommet_id[p].nom_sommet)
+            print(tab_sommet_id[p].link)
+    print("\n")
 
-            print("Il est cyclique :", not the_acyclique_result)
-        print("\n")
+    # Vérification si dégénérée
+    degenere, pourquoi = verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id)
+    print("Il est dégénéré :", degenere)
+    print(pourquoi)
+    print("\n")
 
-        # Vérification si connexe
-        est_connexe, sous_tableau = connexe(proposition_quantity, tab_sommet_id)
-        print("Il est connexe :", est_connexe)
-        # Affichage des liens
-        if est_connexe == False:
-            # Affichage des graphes
-            print("Voici les sous graphes.")
-            print("\n")
-            for i in range(len(sous_tableau)):
-                for j in range(len(sous_tableau[i])):
-                    print(sous_tableau[i][j].nom_sommet, end=' ')
-                print("\n")
-            print("On le rend connexe.")
-
-            # Rendre connexe
-            tab_sommet_id = rendre_connexe(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau)
-
-            # Affichage du nouveau graphe
-            print("Voici les nouveaux liens")
-            for p in range(len(tab_s)):
-                print(tab_sommet_id[p].nom_sommet)
-                print(tab_sommet_id[p].link)
-        print("\n")
-
-        # Vérification si dégénérée
-        degenere, pourquoi = verif_degenerecance(proposition_quantity, tab_s, tab_c, tab_sommet_id)
-        print("Il est dégénéré :", degenere)
-        print(pourquoi)
-        print("\n")
-
-        # Calcul des coûts potentiels
-        cout_pot = couts_potentiels(proposition_couts, proposition_quantity)
-        # Calcul des coûts marginaux
-        couts_marge = couts_marginaux(proposition_couts, cout_pot)
-        # Tant qu'on a des couts marginaux négatifs
-        cout_marginal_negatif = not verif_cout_marginal_positif(couts_marge)
-        if cout_marginal_negatif:
-            # On rend la proposition optimisée
-            tab_sommet_id = rendre_optimise(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau, couts_marge)
+    # Calcul des coûts potentiels
+    cout_pot = couts_potentiels(proposition_couts, proposition_quantity)
+    # Calcul des coûts marginaux
+    couts_marge = couts_marginaux(proposition_couts, cout_pot)
+    # Tant qu'on a des couts marginaux négatifs
+    cout_marginal_negatif = not verif_cout_marginal_positif(couts_marge)
+    if cout_marginal_negatif:
+        # On rend la proposition optimisée (on cherche où ajouter un arrête et on l'ajoute dans tab_sommet_id
+        ligne, colonne, tab_sommet_id = rendre_optimise(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tableau, couts_marge)
+        # On répartit les quantités grâce à tab_sommet_id
+        proposition_quantity, arrete_supr = répartition_couts(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, ligne, colonne)
+        # arrete_surpimee = supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, arrete_a_supr)
+        # print("Pour optimiser, on a supprimé cette arête :", arrete_surpimee)
+        print("Nouvelle proposition :", proposition_quantity)
 
     return proposition_quantity
 
@@ -538,14 +553,11 @@ def rendre_optimise(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tabl
         for j in range(len(couts_marge[i])):
             if proposition_quantity[i][j] == 0:
                 if couts_marge[i][j] < cout_min_possible:
-                    print("FEUR")
                     ligne, colonne = i, j
                     cout_min_possible = couts_marge[i][j]
 
     # Maintenant qu'on a l'emplacement de l'arête, on l'ajoute
     # On veut ajouter une arête vide
-    print("Cout minim", cout_min_possible)
-
     tab_sommet_id[ligne].link_id.append(tab_sommet_id[ligne + len(tab_s) + 1].id_sommet)
     tab_sommet_id[ligne].link.append(tab_sommet_id[ligne + len(tab_s) + 1].nom_sommet)
 
@@ -556,9 +568,134 @@ def rendre_optimise(proposition_quantity, tab_sommet_id, tab_s, tab_c, sous_tabl
         print(tab_sommet_id[p].nom_sommet)
         print(tab_sommet_id[p].link)
 
-    return tab_sommet_id
+    return ligne, colonne, tab_sommet_id
+
+
+def répartition_couts(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, ligne, colonne):
+    # Conversion de l'arête en sommet
+    # Le S
+    sommet_arete_0 = tab_sommet_id[ligne]
+    # Le C
+    sommet_arete_1 = tab_sommet_id[colonne + len(tab_s)]
+
+    tableau_arrete_sommet = []
+    tableau_de_tableau_arete_nulles = []
+    # On retrouve les valeurs des arêtes qui forment le cycle et on les ajoute à tableau_arrete_sommet
+    for i in range(len(le_cycle) - 1):
+        # On veut récupérer les valeurs des sommets cycle dans la liste des sommets générale
+        if le_cycle[i].nom_sommet.startswith("S"):
+            tableau_arrete_sommet.append(
+                proposition_quantity[le_cycle[i].id_sommet][le_cycle[i + 1].id_sommet - len(tab_s)])
+        else:
+            tableau_arrete_sommet.append(
+                proposition_quantity[le_cycle[i + 1].id_sommet][le_cycle[i].id_sommet - len(tab_s)])
+
+    # On cherche la valeur de l'arrete la plus petite sans compter 0
+    tab_sans_zero = [valeur for valeur in tableau_arrete_sommet if valeur != 0]
+    for i in range(len(tab_sans_zero)):
+        print("Condition", i, ":", tab_sans_zero[i])
+    tab_sans_zero = [tab_sans_zero[0], tab_sans_zero[-1]]
+    plus_petit = min(tab_sans_zero)
+
+    print("tableau aretes", tableau_arrete_sommet)
+
+    # On a la valeur à soustraire, maintenant, on veut effectivement la soustraire et l'additionner
+    # On commence par se placer sur l'arete nulle
+    # Pour ça on utilise sommet_arete_0, sommet_arete_1
+    # Trouver l'index du chiffre 3
+    index_arrete = tableau_arrete_sommet.index(sommet_arete_0)
+
+    # Séparer le tableau en deux parties
+    partie1 = tableau_arrete_sommet[index_arrete:]
+    partie2 = tableau_arrete_sommet[:index_arrete]
+
+    # Concaténer les deux parties dans l'ordre requis
+    tableau_arrete_sommet_rangé = partie1 + partie2
+
+    nombre_iterations = len(tableau_arrete_sommet_rangé)
+    for i in range(nombre_iterations):
+        if i % 2 == 0:
+            tableau_arrete_sommet_rangé[i] += plus_petit
+
+        else:
+            tableau_arrete_sommet_rangé[i] -= plus_petit
+
+    # Maintenant, on met les valeurs calculées dans la proposition de base
+    for i in range(len(le_cycle) - 1):
+        tableau_arete_nulles = []
+        # On veut récupérer les valeurs des sommets cycle dans la liste des sommets générale
+        if le_cycle[i].nom_sommet.startswith("S"):
+            proposition_quantity[le_cycle[i].id_sommet][le_cycle[i + 1].id_sommet - len(tab_s)] = tableau_arrete_sommet[i]
+            if tableau_arrete_sommet[i] == 0:
+                tableau_arete_nulles.append(le_cycle[i].nom_sommet)
+                tableau_arete_nulles.append(le_cycle[i + 1].nom_sommet)
+                tableau_de_tableau_arete_nulles.append(tableau_arete_nulles)
+
+        else:
+            proposition_quantity[le_cycle[i + 1].id_sommet][le_cycle[i].id_sommet - len(tab_s)] = tableau_arrete_sommet[i]
+            if tableau_arrete_sommet[i] == 0:
+                tableau_arete_nulles.append(le_cycle[i].nom_sommet)
+                tableau_arete_nulles.append(le_cycle[i + 1].nom_sommet)
+                tableau_de_tableau_arete_nulles.append(tableau_arete_nulles)
+
+    return proposition_quantity, tableau_de_tableau_arete_nulles
 
 
 
+"""
+def new_supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, arete_nulle):
+    # On prend l'arete nulle. On veut que le cycle[0] soit arete nulle et que le tableau soit rangé en fonction
+   if arete_nulle != None:
+       index_arete_nulle_0 = le_cycle.index(arete_nulle[0])
+       index_arete_nulle_1 = le_cycle.index(arete_nulle[1])
+       point_central = le_cycle[index_arete_nulle]
 
+    tableau_arete_nulles = []
+    tableau_arrete_sommet = []
+    tableau_de_tableau_arete_nulles = []
+    # On retrouve les valeurs des arêtes qui forment le cycle
+    for i in range(len(le_cycle) - 1):
+        # On veut récupérer les valeurs des sommets cycle dans la liste des sommets générale
+        if le_cycle[i].nom_sommet.startswith("S"):
+            tableau_arrete_sommet.append(
+                proposition_quantity[le_cycle[i].id_sommet][le_cycle[i + 1].id_sommet - len(tab_s)])
+        else:
+            tableau_arrete_sommet.append(
+                proposition_quantity[le_cycle[i + 1].id_sommet][le_cycle[i].id_sommet - len(tab_s)])
+
+    # On cherche la valeur de l'arrete la plus petite sans compter 0
+    tab_sans_zero = [valeur for valeur in tableau_arrete_sommet if valeur != 0]
+    for i in range(len(tab_sans_zero)):
+        print("Condition", i,":" , tab_sans_zero[i])
+    tab_sans_zero = [tab_sans_zero[0], tab_sans_zero[-1]]
+    plus_petit = min(tab_sans_zero)
+
+    # On a la valeur à soustraire, maintenant, on veut effectivement la soustraire et l'additionner
+    nombre_iterations = len(tableau_arrete_sommet)
+    for i in range(nombre_iterations):
+        if i % 2 == 0:
+            tableau_arrete_sommet[i] += plus_petit
+
+        else:
+            tableau_arrete_sommet[i] -= plus_petit
+
+    # Maintenant, on met les valeurs calculées dans la proposition de base
+    for i in range(len(le_cycle) - 1):
+        tableau_arete_nulles = []
+        # On veut récupérer les valeurs des sommets cycle dans la liste des sommets générale
+        if le_cycle[i].nom_sommet.startswith("S"):
+            proposition_quantity[le_cycle[i].id_sommet][le_cycle[i + 1].id_sommet - len(tab_s)] = tableau_arrete_sommet[i]
+            if tableau_arrete_sommet[i] == 0:
+                tableau_arete_nulles.append(le_cycle[i].nom_sommet)
+                tableau_arete_nulles.append(le_cycle[i + 1].nom_sommet)
+                tableau_de_tableau_arete_nulles.append(tableau_arete_nulles)
+
+        else:
+            proposition_quantity[le_cycle[i + 1].id_sommet][le_cycle[i].id_sommet - len(tab_s)] = tableau_arrete_sommet[i]
+            if tableau_arrete_sommet[i] == 0:
+                tableau_arete_nulles.append(le_cycle[i].nom_sommet)
+                tableau_arete_nulles.append(le_cycle[i + 1].nom_sommet)
+                tableau_de_tableau_arete_nulles.append(tableau_arete_nulles)
+
+    return"""
 
