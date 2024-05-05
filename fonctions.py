@@ -194,10 +194,13 @@ def couts_potentiels(couts,proposition):
     decoration_affichage("====== Calcul des potentiels ======")
     print("\n=> Système linéaire pour le calcul des potentiels :")
     # Affichage du système linéaire
+    print("len proposition", len(proposition))
     for i in range(len(proposition)):
         for j in range(len(proposition[i])):
             
             if proposition[i][j] != 0:
+                print("i",i)
+                print("j",j)
                 print(f"E(S{i+1}) - E(C{j+1}) = {couts[i][j]}")
 
     # On parcourt les lignes et les colonnes de la matrice de proposition
