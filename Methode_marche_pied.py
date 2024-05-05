@@ -79,9 +79,6 @@ def detecter_cycle(sommet, visited, parent, cycle, tab_sommet_id):
                 return True
         # Si le voisin est déjà visité et n'est pas le parent du sommet actuel, alors il y a un cycle
         elif parent != voisin_id:
-            cycle.append(tab_sommet_id[voisin_id])
-            #for voisin in sommet.link_id:
-            #cycle.pop(voisin)
             return True
 
     cycle.pop()
@@ -97,8 +94,10 @@ def acyclique(tab_sommet_id):
         if not visited[sommet.id_sommet]:
             cycle = []
             if detecter_cycle(sommet, visited, -1, cycle, tab_sommet_id):
+                print("patate")
                 cycle.pop(0)
-                # cycle.append(cycle[0])  # Ajouter le premier sommet du cycle à la fin
+                cycle.pop(0)
+                cycle.append(cycle[0])  # Ajouter le premier sommet du cycle à la fin
                 return cycle
 
     return None
