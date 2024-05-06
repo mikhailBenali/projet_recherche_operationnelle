@@ -70,18 +70,23 @@ def graph_creation(proposition_quantity):
 # Fonction pour détecter les cycles dans un graphe non-dirigé
 def detecter_cycle(sommet, visited, parent, cycle, tab_sommet_id):
     visited[sommet.id_sommet] = True
+    # On ajoute le sommet au cycle
     cycle.append(sommet)
 
     # Parcourir tous les voisins du sommet
     for voisin_id in sommet.link_id:
+        # Si le voisin n'a jamais été visité
         if not visited[voisin_id]:
+            # On le fait de manière récursive
             if detecter_cycle(tab_sommet_id[voisin_id], visited, sommet.id_sommet, cycle, tab_sommet_id):
                 return True
+
         # Si le voisin est déjà visité et n'est pas le parent du sommet actuel, alors il y a un cycle
         elif parent != voisin_id:
             return True
 
     cycle.pop()
+    # Alors il n'y a pas de cycle
     return False
 
 
@@ -94,9 +99,11 @@ def acyclique(tab_sommet_id):
         if not visited[sommet.id_sommet]:
             cycle = []
             if detecter_cycle(sommet, visited, -1, cycle, tab_sommet_id):
-                print("patate")
-                cycle.pop(0)
-                cycle.pop(0)
+                # cycle.pop(0 )
+                # cycle.pop(0)
+                if len(cycle) > 4:
+                    # Garder seulement les 4 derniers éléments du tableau
+                    cycle = cycle[-4:]
                 cycle.append(cycle[0])  # Ajouter le premier sommet du cycle à la fin
                 return cycle
 
@@ -575,9 +582,12 @@ def methode_du_marche_pied(proposition_quantity, proposition_couts):
             tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
 
             # On vérifie de nouveau s'il est cyclique
-            the_acyclique_result, the_le_cycle = acyclique(proposition_quantity, tab_sommet_id)
+            the_le_cycle = acyclique(tab_sommet_id)
+            if the_le_cycle:
+                print("Il est cyclique.")
+            else:
+                print("Il n'est pas cyclique.")
 
-            print("Il est cyclique :", not the_acyclique_result)
 
         print("\n")
 

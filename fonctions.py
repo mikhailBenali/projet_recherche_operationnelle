@@ -81,6 +81,7 @@ def algo_nord_ouest(proposition_transport,dimensions):
     
     return solution
 
+
 def algo_balas_hammer(couts, proposition):
     copie_couts = np.array(couts)
     copie_proposition = np.array(proposition)
@@ -173,6 +174,7 @@ def algo_balas_hammer(couts, proposition):
     copie_proposition=copie_proposition.tolist()
     return copie_proposition
 
+
 def calcul_cout_total(matrice_cout,proposition_transport,dimensions):
     lignes,colonnes=dimensions
     cout_total=0
@@ -247,7 +249,7 @@ def couts_potentiels(couts,proposition):
     for i in range(len(couts)):
         print(f"E(S{i+1}) =", int(solution[i]))
     for i in range(len(proposition)):
-        print(f"E(C{i+1}) =", int(solution[len(couts)+i]))
+         print(f"E(C{i+1}) =", int(solution[len(couts)+i]))
     
     print("\n=> Matrice des coûts potentiels :\n")
     tab_couts_pot=pd.DataFrame(couts_pot.astype(int), index=[f"S{i+1}" for i in range(len(couts))], columns=[f"C{i+1}" for i in range(len(couts[0]))])

@@ -2,26 +2,19 @@ from fonctions import *
 from Methode_marche_pied import *
 
 
-proposition_couts = [[5, 6], [1, 9]]
-proposition_quantity = [[50, 0], [10, 20]]
+"""proposition_couts = [[5, 6], [1, 9]]
+proposition_quantity = [[50, 10], [10, 20]]
 
 print("PRE")
 tab_c, tab_s, tab_sommet_id = graph_creation(proposition_quantity)
 cycle = acyclique(tab_sommet_id)
 if cycle:
-    print("Cycle trouvé :", cycle)
+    for i in range(len(cycle)):
+        print("Cycle trouvé :", cycle[i].nom_sommet)
 else:
     print("Pas de cycle dans le graphe.")
 # new_supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, arete_nulle)
-print("FIN")
-
-
-# proposition_quantity = methode_du_marche_pied(proposition_quantity, proposition_couts)
-
-
-print("FIN DU PREMIER")
-
-
+print("FIN")"""
 
 # Création d'une arête nulle
 """for i in range(len(tab_s)):
@@ -110,6 +103,9 @@ while True:
 
                         proposition_quantity = methode_du_marche_pied(proposition_quantity_1, couts_unitaires)
 
+                        afficher_proposition_transport(matrice_NO)
+                        cout_total = calcul_cout_total(couts_unitaires, matrice_BH, dimensions)
+
                 elif algo_choisi == "2":
                     num_proposition = int(input("Entrer le n° de proposition de problème de transport à initialiser (entre 1 et 12) : "))
                     if 1 <= num_proposition <= 12:
@@ -127,6 +123,11 @@ while True:
                         proposition_quantity = reduction(matrice_BH)
 
                         proposition_quantity = methode_du_marche_pied(proposition_quantity, couts_unitaires)
+
+                        afficher_proposition_transport(matrice_BH)
+                        cout_total = calcul_cout_total(couts_unitaires, matrice_BH, dimensions)
+
+
 
                 elif algo_choisi == "3":
                     print("Vous avez choisi de revenir au menu principal")
