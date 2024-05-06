@@ -16,7 +16,6 @@ else:
 # new_supr_arrete(proposition_quantity, tab_sommet_id, le_cycle, tab_s, tab_c, arete_nulle)
 print("FIN")"""
 
-# Création d'une arête nulle
 """for i in range(len(tab_s)):
     print("Link de :", tab_sommet_id[i].nom_sommet)
     print(tab_sommet_id[i].link_id)
